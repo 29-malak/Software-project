@@ -205,7 +205,6 @@ function seedData() {
   console.log('Database seeded successfully!');
 }
 
-/
 // ============================================
 // GOOGLE OAUTH STRATEGY
 // ============================================
