@@ -713,7 +713,8 @@ function loadAdminDestinations() {
       '<td>' + d.name + '</td>' +
       '<td>' + d.location + '</td>' +
       '<td>$' + d.price + '</td>' +
-      '<td><button class="btn btn-sm btn-outline" onclick="editDestination(' + d.id + ')">Edit</button></td>' +'</tr>';
+      '<td><button class="btn btn-sm btn-outline" onclick="alert('Edit ' + d.name + '')">Edit</button></td>' +
+    '</tr>';
   }).join('');
 }
 
@@ -840,6 +841,27 @@ function searchDestinations() {
 // INITIALIZATION
 // ============================================
 document.addEventListener('DOMContentLoaded', function() {
+  // Check for Google OAuth token in URL
+  const urlParams = new URLSearchParams(window.location.search);
+  const googleToken = urlParams.get('token');
+  if (googleToken) {
+    localStorage.setItem('escapeo-token', googleToken);
+    // Remove token from URL
+    window.history.replaceState({}, document.title, window.location.pathname);
+    // Fetch user data with token
+    fetch('/api/auth/me', {
+      headers: { 'Authorization': 'Bearer ' + googleToken }
+    })
+    .then(res => res.json())
+    .then(user => {
+      currentUser = user;
+      localStorage.setItem('escapeo-user', JSON.stringify(currentUser));
+      updateAuthUI();
+      showToast('Welcome, ' + (currentUser.firstName || 'User') + '!');
+    })
+    .catch(err => console.log('Google login error:', err));
+  }
+
   // Hide loader
   setTimeout(function() {
     document.getElementById('loader').classList.add('hidden');

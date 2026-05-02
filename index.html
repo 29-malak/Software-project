@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="styles.css">
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css">
+<base target="_blank">
 </head>
 <body>
     <!-- Loading Screen -->
@@ -591,7 +592,7 @@
             </form>
             <div class="modal-divider"><span>or continue with</span></div>
             <div class="social-login">
-                <button class="btn btn-outline">🔍 Google</button>
+                <button class="btn btn-outline" onclick="window.location.href='/auth/google'">🔍 Sign in with Google</button>
                 <button class="btn btn-outline">📘 Facebook</button>
             </div>
             <p class="modal-footer">Don't have an account? <a href="#" onclick="switchModal('loginModal','registerModal')">Sign up</a></p>
