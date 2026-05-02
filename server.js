@@ -274,7 +274,7 @@ if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET) {
   console.log('⚠️  Google OAuth not configured - set GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET env vars');
 }
 
-/ ============================================
+// ============================================
 // AUTH MIDDLEWARE
 // ============================================
 function authenticateToken(req, res, next) {
