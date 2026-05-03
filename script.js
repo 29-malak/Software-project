@@ -279,8 +279,33 @@ function logout() {
 }
 
 // ============================================
-// ROUTING
+// GOOGLE OAUTH HANDLER
 // ============================================
+function handleGoogleCallback() {
+  const urlParams = new URLSearchParams(window.location.search);
+  const token = urlParams.get('token');
+  const userStr = urlParams.get('user');
+  
+  if (token && userStr) {
+    try {
+      const user = JSON.parse(decodeURIComponent(userStr));
+      currentUser = user;
+      localStorage.setItem('escapeo-user', JSON.stringify(user));
+      localStorage.setItem('escapeo-token', token);
+      updateAuthUI();
+      showToast('Welcome, ' + user.firstName + '!');
+      
+      // Clean URL
+      window.history.replaceState({}, document.title, window.location.pathname);
+    } catch (e) {
+      console.error('Error parsing Google user data:', e);
+    }
+  }
+}
+
+// ============================================
+// ROUTING
+// ============================================"
 function router(page) {
   document.querySelectorAll('.page').forEach(function(p) { p.classList.add('hidden'); });
   document.getElementById('page-home').classList.add('hidden');
@@ -833,6 +858,9 @@ function searchDestinations() {
 // INITIALIZATION
 // ============================================
 document.addEventListener('DOMContentLoaded', function() {
+  // Handle Google OAuth callback if present in URL
+  handleGoogleCallback();
+  
   setTimeout(function() {
     document.getElementById('loader').classList.add('hidden');
   }, 1500);
