@@ -66,7 +66,6 @@ function changeLanguage(lang) {
   document.getElementById('langBtn').textContent = lang.toUpperCase() + ' ▼';
   updateGreeting();
 
-  // Apply RTL for Arabic
   if (lang === 'ar') {
     document.body.classList.add('rtl');
   } else {
@@ -107,7 +106,6 @@ const packages = [
   { id: 4, title: "Greek Island Hopper", destination: "Santorini, Greece", duration: "8 Days", image: "https://images.unsplash.com/photo-1570077188670-e3a8d69ac5ff?w=800&q=80", price: 2199, highlights: ["Island Cruise", "Wine Tasting", "Sunset Dinner", "Beach Club"] }
 ];
 
-// UPDATED TESTIMONIALS WITH ARABIC NAMES
 const testimonials = [
   { id: 1, name: "Sarah", location: "Cairo, Egypt", avatar: "https://ui-avatars.com/api/?name=Sarah&background=e91e63&color=fff", rating: 5, text: "Escapeo made our honeymoon absolutely magical! The attention to detail and personalized service exceeded all expectations." },
   { id: 2, name: "Muhammad", location: "Dubai, UAE", avatar: "https://ui-avatars.com/api/?name=Muhammad&background=2196f3&color=fff", rating: 5, text: "Best travel agency I've ever used. They found hidden gems we never would have discovered on our own. Truly unforgettable!" },
@@ -124,7 +122,6 @@ let currentUser = JSON.parse(localStorage.getItem('escapeo-user')) || null;
 let bookings = JSON.parse(localStorage.getItem('escapeo-bookings')) || [];
 let wishlist = JSON.parse(localStorage.getItem('escapeo-wishlist')) || [];
 
-// Seed data if empty
 if (!localStorage.getItem('escapeo-destinations')) {
   localStorage.setItem('escapeo-destinations', JSON.stringify(destinations));
 }
@@ -140,7 +137,7 @@ function showToast(message, type) {
   const container = document.getElementById('toastContainer');
   const toast = document.createElement('div');
   toast.className = 'toast ' + type;
-  var icon = type === 'success' ? '&#10003;' : type === 'error' ? '&#10007;' : '&#9888;';
+  var icon = type === 'success' ? '✓' : type === 'error' ? '✗' : '⚠';
   toast.innerHTML = '<span>' + icon + '</span> <span>' + message + '</span>';
   container.appendChild(toast);
   setTimeout(function() {
@@ -179,7 +176,6 @@ function initNavbar() {
     }
   });
 
-  // Language dropdown
   var langBtn = document.getElementById('langBtn');
   var langDropdown = document.getElementById('langDropdown');
   langBtn.addEventListener('click', function(e) {
@@ -194,7 +190,6 @@ function initNavbar() {
     });
   });
 
-  // User dropdown
   var userMenu = document.getElementById('userMenu');
   var userDropdown = document.getElementById('userDropdown');
   if (userMenu) {
@@ -205,7 +200,6 @@ function initNavbar() {
     document.addEventListener('click', function() { userDropdown.classList.remove('active'); });
   }
 
-  // Mobile menu
   var hamburger = document.getElementById('hamburger');
   var mobileMenu = document.getElementById('mobileMenu');
   var mobileClose = document.getElementById('mobileClose');
@@ -335,15 +329,15 @@ function renderDestinations(filter) {
         '<img src="' + dest.image + '" alt="' + dest.name + '" loading="lazy">' +
         '<span class="destination-badge">' + dest.category + '</span>' +
         '<button class="wishlist-btn ' + (isWishlisted ? 'active' : '') + '" onclick="toggleWishlist(' + dest.id + ')">' +
-          (isWishlisted ? '&#10084;' : '&#9825;') +
+          (isWishlisted ? '❤' : '♡') +
         '</button>' +
       '</div>' +
       '<div class="destination-info">' +
         '<div class="destination-header">' +
           '<h3 class="destination-name">' + dest.name + '</h3>' +
-          '<div class="destination-rating"><span>&#9733;</span> ' + dest.rating + '</div>' +
+          '<div class="destination-rating"><span>★</span> ' + dest.rating + '</div>' +
         '</div>' +
-        '<p class="destination-location">&#128205; ' + dest.location + ', ' + dest.country + '</p>' +
+        '<p class="destination-location">📍 ' + dest.location + ', ' + dest.country + '</p>' +
         '<div class="destination-footer">' +
           '<div class="destination-price">From <strong>$' + dest.price + '</strong>/night</div>' +
           '<button class="btn btn-primary btn-sm" onclick="startBooking(' + dest.id + ')">Book Now</button>' +
@@ -364,8 +358,8 @@ function renderPackages() {
         '<div class="package-content">' +
           '<h3 class="package-title">' + pkg.title + '</h3>' +
           '<div class="package-meta">' +
-            '<span>&#128205; ' + pkg.destination + '</span>' +
-            '<span>&#9201; ' + pkg.duration + '</span>' +
+            '<span>📍 ' + pkg.destination + '</span>' +
+            '<span>⏱ ' + pkg.duration + '</span>' +
           '</div>' +
           '<ul class="package-highlights">' +
             pkg.highlights.map(function(h) { return '<li>' + h + '</li>'; }).join('') +
@@ -383,8 +377,12 @@ function renderPackages() {
 function renderTestimonials() {
   var grid = document.getElementById('testimonialsGrid');
   grid.innerHTML = testimonials.map(function(t) {
+    var stars = '';
+    for (var i = 0; i < t.rating; i++) {
+      stars += '★';
+    }
     return '<div class="testimonial-card">' +
-      '<div class="testimonial-stars">' + '&#9733;'.repeat(t.rating) + '</div>' +
+      '<div class="testimonial-stars">' + stars + '</div>' +
       '<p class="testimonial-text">"' + t.text + '"</p>' +
       '<div class="testimonial-author">' +
         '<img src="' + t.avatar + '" alt="' + t.name + '">' +
@@ -426,14 +424,14 @@ function loadWishlist() {
     return '<div class="destination-card">' +
       '<div class="destination-image">' +
         '<img src="' + dest.image + '" alt="' + dest.name + '">' +
-        '<button class="wishlist-btn active" onclick="toggleWishlist(' + dest.id + ')">&#10084;</button>' +
+        '<button class="wishlist-btn active" onclick="toggleWishlist(' + dest.id + ')">❤</button>' +
       '</div>' +
       '<div class="destination-info">' +
         '<div class="destination-header">' +
           '<h3 class="destination-name">' + dest.name + '</h3>' +
-          '<div class="destination-rating"><span>&#9733;</span> ' + dest.rating + '</div>' +
+          '<div class="destination-rating"><span>★</span> ' + dest.rating + '</div>' +
         '</div>' +
-        '<p class="destination-location">&#128205; ' + dest.location + '</p>' +
+        '<p class="destination-location">📍 ' + dest.location + '</p>' +
         '<div class="destination-footer">' +
           '<div class="destination-price">From <strong>$' + dest.price + '</strong>/night</div>' +
           '<button class="btn btn-primary btn-sm" onclick="startBooking(' + dest.id + ')">Book Now</button>' +
@@ -620,9 +618,9 @@ function loadBookings() {
       '</div>' +
       '<div class="booking-details">' +
         '<h3>' + (b.destination ? b.destination.name : b.package.title) + '</h3>' +
-        '<p>&#128205; ' + (b.destination ? b.destination.location : b.package.destination) + '</p>' +
-        '<p>&#128197; ' + (b.dates.checkIn || 'N/A') + ' to ' + (b.dates.checkOut || 'N/A') + '</p>' +
-        '<p>&#128101; ' + b.travelers.adults + ' Adults, ' + b.travelers.children + ' Children</p>' +
+        '<p>📍 ' + (b.destination ? b.destination.location : b.package.destination) + '</p>' +
+        '<p>📅 ' + (b.dates.checkIn || 'N/A') + ' to ' + (b.dates.checkOut || 'N/A') + '</p>' +
+        '<p>👥 ' + b.travelers.adults + ' Adults, ' + b.travelers.children + ' Children</p>' +
       '</div>' +
       '<div class="booking-price">$' + b.total.toLocaleString() + '</div>' +
       '<div class="booking-status status-' + b.status + '">' + b.status + '</div>' +
@@ -634,7 +632,7 @@ function loadBookings() {
 // ADMIN DASHBOARD - FIXED
 // ============================================
 var adminCurrentTab = 'overview';
-var adminCharts = {}; // Store chart instances to destroy them before creating new ones
+var adminCharts = {};
 
 function showAdminTab(tab) {
   adminCurrentTab = tab;
@@ -649,13 +647,11 @@ function showAdminTab(tab) {
 }
 
 function loadAdminDashboard() {
-  // Destroy existing charts before loading new ones
   destroyAdminCharts();
   showAdminTab('overview');
 }
 
 function destroyAdminCharts() {
-  // Destroy all stored chart instances
   Object.keys(adminCharts).forEach(function(key) {
     if (adminCharts[key]) {
       adminCharts[key].destroy();
@@ -668,7 +664,6 @@ function loadAdminOverview() {
   document.getElementById('statTotalBookings').textContent = bookings.length;
   document.getElementById('statRevenue').textContent = '$' + bookings.reduce(function(sum, b) { return sum + b.total; }, 0).toLocaleString();
 
-  // Destroy old charts before creating new ones
   destroyAdminCharts();
 
   var ctx1 = document.getElementById('bookingsChart');
@@ -713,13 +708,11 @@ function loadAdminDestinations() {
       '<td>' + d.name + '</td>' +
       '<td>' + d.location + '</td>' +
       '<td>$' + d.price + '</td>' +
-      '<td><button class="btn btn-sm btn-outline" onclick="alert('Edit ' + d.name + '')">Edit</button></td>' +
-    '</tr>';
+      '<td><button class="btn btn-sm btn-outline" onclick="editDestination(' + d.id + ')">Edit</button></td>' +'</tr>';
   }).join('');
 }
 
 function loadAdminAnalytics() {
-  // Destroy old charts before creating new ones
   destroyAdminCharts();
 
   var ctx1 = document.getElementById('monthlyRevenueChart');
@@ -800,7 +793,6 @@ function addDestination(e) {
   renderDestinations();
   loadAdminDestinations();
 
-  // Clear form
   document.getElementById("destName").value = '';
   document.getElementById("destLocation").value = '';
   document.getElementById("destCountry").value = '';
@@ -841,50 +833,19 @@ function searchDestinations() {
 // INITIALIZATION
 // ============================================
 document.addEventListener('DOMContentLoaded', function() {
-  // Check for Google OAuth token in URL
-  const urlParams = new URLSearchParams(window.location.search);
-  const googleToken = urlParams.get('token');
-  if (googleToken) {
-    localStorage.setItem('escapeo-token', googleToken);
-    // Remove token from URL
-    window.history.replaceState({}, document.title, window.location.pathname);
-    // Fetch user data with token
-    fetch('/api/auth/me', {
-      headers: { 'Authorization': 'Bearer ' + googleToken }
-    })
-    .then(res => res.json())
-    .then(user => {
-      currentUser = user;
-      localStorage.setItem('escapeo-user', JSON.stringify(currentUser));
-      updateAuthUI();
-      showToast('Welcome, ' + (currentUser.firstName || 'User') + '!');
-    })
-    .catch(err => console.log('Google login error:', err));
-  }
-
-  // Hide loader
   setTimeout(function() {
     document.getElementById('loader').classList.add('hidden');
   }, 1500);
 
-  // Init navbar
   initNavbar();
-
-  // Update auth UI
   updateAuthUI();
-
-  // Update greeting
   updateGreeting();
-
-  // Set language
   changeLanguage(currentLang);
 
-  // Render home page content
   renderDestinations();
   renderPackages();
   renderTestimonials();
 
-  // Init Swiper
   if (typeof Swiper !== 'undefined') {
     new Swiper('.packages-swiper', {
       slidesPerView: 1,
@@ -900,7 +861,6 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }
 
-  // Filter tabs
   document.querySelectorAll('.filter-tab').forEach(function(tab) {
     tab.addEventListener('click', function() {
       document.querySelectorAll('.filter-tab').forEach(function(t) { t.classList.remove('active'); });
@@ -909,7 +869,6 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   });
 
-  // Booking filters
   document.querySelectorAll('.filter-pill').forEach(function(pill) {
     pill.addEventListener('click', function() {
       document.querySelectorAll('.filter-pill').forEach(function(p) { p.classList.remove('active'); });
@@ -917,7 +876,6 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   });
 
-  // Payment method selection
   document.querySelectorAll('.payment-method').forEach(function(method) {
     method.addEventListener('click', function() {
       document.querySelectorAll('.payment-method').forEach(function(m) { m.classList.remove('active'); });
@@ -925,14 +883,12 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   });
 
-  // Close modals on overlay click
   document.getElementById('overlay').addEventListener('click', function() {
     document.querySelectorAll('.modal.active').forEach(function(m) { m.classList.remove('active'); });
     document.getElementById('overlay').classList.remove('active');
     document.body.style.overflow = '';
   });
 
-  // Password strength
   var regPassword = document.getElementById('regPassword');
   if (regPassword) {
     regPassword.addEventListener('input', function(e) {
@@ -945,7 +901,6 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }
 
-  // Smooth scroll for nav links
   document.querySelectorAll('a[href^="#"]').forEach(function(anchor) {
     anchor.addEventListener('click', function(e) {
       var href = this.getAttribute('href');
