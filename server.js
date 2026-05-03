@@ -11,6 +11,12 @@ const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const session = require('express-session');
  
 const app = express();
+// Trust proxy for Railway HTTPS
+app.set('trust proxy', 1);
+
+// باقي الكود...
+app.use(cors());
+app.use(express.json());
 const PORT = process.env.PORT || 3000;
 const JWT_SECRET = 'escapeo-secret-key-2026';
  
