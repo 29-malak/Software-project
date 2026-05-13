@@ -1,85 +1,64 @@
-const translations = {
-  en: {
-    nav: { destinations: "Destinations", packages: "Packages", about: "About", testimonials: "Testimonials", contact: "Contact", login: "Sign In", register: "Sign Up" },
-    hero: { greeting: "Good morning, traveler!", title: "Discover Your Next Adventure", subtitle: "Explore breathtaking destinations, create unforgettable memories, and escape to paradise." },
-    destinations: { tag: "Popular Destinations", title: "Explore the World", subtitle: "Handpicked destinations for your next escape" },
-    packages: { tag: "Travel Packages", title: "Curated Experiences", subtitle: "All-inclusive packages designed for unforgettable journeys" },
-    user: { profile: "Profile", bookings: "My Bookings", wishlist: "Wishlist", logout: "Logout" },
-    booking: { step1: "Dates", step2: "Extras", step3: "Details", step4: "Review", step5: "Payment" }
-  },
-  es: {
-    nav: { destinations: "Destinos", packages: "Paquetes", about: "Nosotros", testimonials: "Testimonios", contact: "Contacto", login: "Iniciar Sesion", register: "Registrarse" },
-    hero: { greeting: "Buenos dias, viajero!", title: "Descubre Tu Proxima Aventura", subtitle: "Explora destinos impresionantes, crea recuerdos inolvidables y escapa al paraiso." },
-    destinations: { tag: "Destinos Populares", title: "Explora el Mundo", subtitle: "Destinos seleccionados para tu proxima escapada" },
-    packages: { tag: "Paquetes de Viaje", title: "Experiencias Curadas", subtitle: "Paquetes todo incluido disenados para viajes inolvidables" },
-    user: { profile: "Perfil", bookings: "Mis Reservas", wishlist: "Favoritos", logout: "Cerrar Sesion" },
-    booking: { step1: "Fechas", step2: "Extras", step3: "Detalles", step4: "Revisar", step5: "Pago" }
-  },
-  fr: {
-    nav: { destinations: "Destinations", packages: "Forfaits", about: "A Propos", testimonials: "Temoignages", contact: "Contact", login: "Connexion", register: "S'inscrire" },
-    hero: { greeting: "Bonjour, voyageur!", title: "Decouvrez Votre Prochaine Aventure", subtitle: "Explorez des destinations a couper le souffle, creez des souvenirs inoubliables." },
-    destinations: { tag: "Destinations Populaires", title: "Explorez le Monde", subtitle: "Destinations selectionnees pour votre prochaine escapade" },
-    packages: { tag: "Forfaits de Voyage", title: "Experiences Sur Mesure", subtitle: "Forfaits tout compris concus pour des voyages inoubliables" },
-    user: { profile: "Profil", bookings: "Mes Reservations", wishlist: "Favoris", logout: "Deconnexion" },
-    booking: { step1: "Dates", step2: "Extras", step3: "Details", step4: "Revision", step5: "Paiement" }
-  },
-  de: {
-    nav: { destinations: "Reiseziele", packages: "Pakete", about: "Uber Uns", testimonials: "Bewertungen", contact: "Kontakt", login: "Anmelden", register: "Registrieren" },
-    hero: { greeting: "Guten Morgen, Reisender!", title: "Entdecken Sie Ihr Nachstes Abenteuer", subtitle: "Erkunden Sie atemberaubende Reiseziele und schaffen Sie unvergessliche Erinnerungen." },
-    destinations: { tag: "Beliebte Reiseziele", title: "Erkunden Sie die Welt", subtitle: "Handverlesene Reiseziele fur Ihren nachsten Ausflug" },
-    packages: { tag: "Reisepakete", title: "Kuratierte Erlebnisse", subtitle: "All-inclusive-Pakete fur unvergessliche Reisen" },
-    user: { profile: "Profil", bookings: "Meine Buchungen", wishlist: "Wunschliste", logout: "Abmelden" },
-    booking: { step1: "Termine", step2: "Extras", step3: "Details", step4: "Uberprufung", step5: "Zahlung" }
-  },
-  ja: {
-    nav: { destinations: "Mokutekichi", packages: "Pakkeji", about: "Watashitachi ni tsuite", testimonials: "Okyakusama no koe", contact: "Otoiawase", login: "Rogin", register: "Touroku" },
-    hero: { greeting: "Ohayou gozaimasu, ryokousha-san!", title: "Tsugi no bouken wo hakken shiyou", subtitle: "Iki wo nomu you na mokutekichi wo tanken shi, wasurerarenai omoide wo tsukurimashou." },
-    destinations: { tag: "Ninki no mokutekichi", title: "Sekai wo tanken", subtitle: "Tsugi no touhi no tame no gensen mokutekichi" },
-    packages: { tag: "Ryokou pakkeji", title: "Gensen taiken", subtitle: "Wasurerarenai tabi no tame no oruinkurushibu pakkeji" },
-    user: { profile: "Purofairu", bookings: "Yoyaku rireki", wishlist: "Okiniir", logout: "Roguauto" },
-    booking: { step1: "Hidzuke", step2: "Opushon", step3: "Shousai", step4: "Kakunin", step5: "Shiharai" }
-  },
-  ar: {
-    nav: { destinations: "الوجهات", packages: "الباقات", about: "من نحن", testimonials: "آراء العملاء", contact: "تواصل معنا", login: "تسجيل الدخول", register: "إنشاء حساب" },
-    hero: { greeting: "صباح الخير، مسافر!", title: "اكتشف مغامرتك القادمة", subtitle: "استكشف وجهات خلابة، واصنع ذكريات لا تُنسى، واهرب إلى الجنة." },
-    destinations: { tag: "وجهات شهيرة", title: "استكشف العالم", subtitle: "وجهات مختارة بعناية لرحلتك القادمة" },
-    packages: { tag: "باقات السفر", title: "تجارب منظمة", subtitle: "باقات شاملة مصممة لرحلات لا تُنسى" },
-    user: { profile: "الملف الشخصي", bookings: "حجوزاتي", wishlist: "المفضلة", logout: "تسجيل الخروج" },
-    booking: { step1: "التواريخ", step2: "إضافات", step3: "التفاصيل", step4: "المراجعة", step5: "الدفع" }
+let currentCurrency = localStorage.getItem('escapeo-currency') || 'USD';
+const EXCHANGE_RATE = 50.5; // 1 USD = 50.5 EGP
+
+function formatPrice(amount) {
+  if (currentCurrency === 'EGP') {
+    return 'ج.م ' + Math.round(amount * EXCHANGE_RATE).toLocaleString();
   }
-};
+  return '$' + amount.toLocaleString();
+}
 
-let currentLang = localStorage.getItem('escapeo-lang') || 'en';
+function formatPriceShort(amount) {
+  if (currentCurrency === 'EGP') {
+    return 'ج.م ' + Math.round(amount * EXCHANGE_RATE);
+  }
+  return '$' + amount;
+}
 
-function changeLanguage(lang) {
-  currentLang = lang;
-  localStorage.setItem('escapeo-lang', lang);
-  document.querySelectorAll('[data-i18n]').forEach(el => {
-    const key = el.dataset.i18n;
-    const keys = key.split('.');
-    let value = translations[lang];
-    for (const k of keys) {
-      value = value ? value[k] : undefined;
-    }
-    if (value) el.textContent = value;
-  });
-  document.getElementById('langBtn').textContent = lang.toUpperCase() + ' ▼';
-  updateGreeting();
+function changeCurrency(currency) {
+  currentCurrency = currency;
+  localStorage.setItem('escapeo-currency', currency);
+  document.getElementById('currencyBtn').textContent = (currency === 'EGP' ? 'ج.م' : '$') + ' ▼';
+  showToast('Currency set to ' + (currency === 'EGP' ? 'Egyptian Pound (EGP)' : 'US Dollar (USD)'));
+  renderDestinations();
+  renderPackages();
+  if (!document.getElementById('page-wishlist').classList.contains('hidden')) {
+    loadWishlist();
+  }
+  if (!document.getElementById('page-bookings').classList.contains('hidden')) {
+    loadBookings();
+  }
+  if (!document.getElementById('page-admin').classList.contains('hidden')) {
+    loadAdminOverview();
+  }
+}
 
-  if (lang === 'ar') {
-    document.body.classList.add('rtl');
-  } else {
-    document.body.classList.remove('rtl');
+function initCurrencySwitcher() {
+  var currencyBtn = document.getElementById('currencyBtn');
+  var currencyDropdown = document.getElementById('currencyDropdown');
+  if (currencyBtn && currencyDropdown) {
+    currencyBtn.textContent = (currentCurrency === 'EGP' ? 'ج.م' : '$') + ' ▼';
+    currencyBtn.addEventListener('click', function(e) {
+      e.stopPropagation();
+      currencyDropdown.classList.toggle('active');
+    });
+    document.addEventListener('click', function() { currencyDropdown.classList.remove('active'); });
+    currencyDropdown.querySelectorAll('a').forEach(function(a) {
+      a.addEventListener('click', function(e) {
+        e.preventDefault();
+        changeCurrency(a.dataset.currency);
+      });
+    });
   }
 }
 
 function updateGreeting() {
   const hour = new Date().getHours();
-  let greeting = (translations[currentLang] && translations[currentLang].hero && translations[currentLang].hero.greeting) || "Good morning, traveler!";
+  let greeting = "Good morning, traveler!";
   if (hour >= 12 && hour < 17) {
-    greeting = greeting.replace("morning", "afternoon").replace("Buenos dias", "Buenas tardes").replace("Bonjour", "Bon apres-midi").replace("Morgen", "Tag").replace("Ohayou", "Konnichiwa").replace("صباح الخير", "مساء الخير");
+    greeting = "Good afternoon, traveler!";
   } else if (hour >= 17) {
-    greeting = greeting.replace("morning", "evening").replace("Buenos dias", "Buenas noches").replace("Bonjour", "Bonsoir").replace("Morgen", "Abend").replace("Ohayou", "Konbanwa").replace("صباح الخير", "مساء الخير");
+    greeting = "Good evening, traveler!";
   }
   const el = document.getElementById('heroGreeting');
   if (el) el.textContent = greeting;
@@ -89,30 +68,36 @@ function updateGreeting() {
 // MOCK DATA
 // ============================================
 const destinations = [
-  { id: 1, name: "Bali", location: "Indonesia", country: "Indonesia", category: "beach", image: "https://images.unsplash.com/photo-1537996194471-e657df975ab4?w=800&q=80", price: 89, rating: 4.8, reviews: 234 },
-  { id: 2, name: "Santorini", location: "Greece", country: "Greece", category: "beach", image: "https://images.unsplash.com/photo-1570077188670-e3a8d69ac5ff?w=800&q=80", price: 145, rating: 4.9, reviews: 189 },
-  { id: 3, name: "Kyoto", location: "Japan", country: "Japan", category: "cultural", image: "https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?w=800&q=80", price: 120, rating: 4.7, reviews: 312 },
-  { id: 4, name: "Swiss Alps", location: "Switzerland", country: "Switzerland", category: "mountain", image: "https://images.unsplash.com/photo-1531366936337-7c912a4589a7?w=800&q=80", price: 175, rating: 4.9, reviews: 156 },
-  { id: 5, name: "Marrakech", location: "Morocco", country: "Morocco", category: "cultural", image: "https://images.unsplash.com/photo-1539020140153-e479b8c22e70?w=800&q=80", price: 75, rating: 4.6, reviews: 198 },
-  { id: 6, name: "Istanbul", location: "Turkey", country: "Turkey", category: "city", image: "https://images.unsplash.com/photo-1524231757912-21f4fe3a7200?w=800&q=80", price: 135, rating: 4.8, reviews: 145 },
-  { id: 7, name: "Maldives", location: "Maldives", country: "Maldives", category: "beach", image: "https://images.unsplash.com/photo-1514282401047-d79a71a590e8?w=800&q=80", price: 250, rating: 4.9, reviews: 267 },
-  { id: 8, name: "New York", location: "USA", country: "USA", category: "city", image: "https://images.unsplash.com/photo-1496442226666-8d4d0e62e6e9?w=800&q=80", price: 180, rating: 4.5, reviews: 423 }
+  { id: 1, name: "Tokyo", location: "Japan", country: "Japan", category: "city", image: "https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?w=800&q=80", price: 145, rating: 4.8, reviews: 312 },
+  { id: 2, name: "Istanbul", location: "Turkey", country: "Turkey", category: "cultural", image: "https://images.unsplash.com/photo-1524231757912-21f4fe3a7200?w=800&q=80", price: 95, rating: 4.7, reviews: 198 },
+  { id: 3, name: "New York", location: "USA", country: "USA", category: "city", image: "https://images.unsplash.com/photo-1496442226666-8d4d0e62e6e9?w=800&q=80", price: 220, rating: 4.6, reviews: 523 },
+  { id: 4, name: "Paris", location: "France", country: "France", category: "cultural", image: "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=800&q=80", price: 180, rating: 4.9, reviews: 445 },
+  { id: 5, name: "Maldives", location: "Maldives", country: "Maldives", category: "beach", image: "https://images.unsplash.com/photo-1514282401047-d79a71a590e8?w=800&q=80", price: 350, rating: 4.9, reviews: 267 },
+  { id: 6, name: "Santorini", location: "Greece", country: "Greece", category: "beach", image: "https://images.unsplash.com/photo-1570077188670-e3a8d69ac5ff?w=800&q=80", price: 195, rating: 4.8, reviews: 389 },
+  { id: 7, name: "London", location: "England", country: "UK", category: "city", image: "https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?w=800&q=80", price: 165, rating: 4.7, reviews: 378 },
+  { id: 8, name: "Swiss Alps", location: "Switzerland", country: "Switzerland", category: "mountain", image: "https://images.unsplash.com/photo-1531366936337-7c912a4589a7?w=800&q=80", price: 210, rating: 4.9, reviews: 156 },
+  { id: 9, name: "Dubai", location: "UAE", country: "UAE", category: "city", image: "https://images.unsplash.com/photo-1512453979798-5ea266f8880c?w=800&q=80", price: 185, rating: 4.6, reviews: 298 },
+  { id: 10, name: "Bali", location: "Indonesia", country: "Indonesia", category: "beach", image: "https://images.unsplash.com/photo-1537996194471-e657df975ab4?w=800&q=80", price: 89, rating: 4.8, reviews: 234 },
+  { id: 11, name: "Kyoto", location: "Japan", country: "Japan", category: "cultural", image: "https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?w=800&q=80", price: 120, rating: 4.7, reviews: 312 },
+  { id: 12, name: "Marrakech", location: "Morocco", country: "Morocco", category: "cultural", image: "https://images.unsplash.com/photo-1539020140153-e479b8c22e70?w=800&q=80", price: 75, rating: 4.6, reviews: 198 }
 ];
 
 const packages = [
-  { id: 1, title: "Bali Bliss", destination: "Bali, Indonesia", duration: "7 Days", image: "https://images.unsplash.com/photo-1537996194471-e657df975ab4?w=800&q=80", price: 1299, highlights: ["Private Villa", "Sunset Cruise", "Temple Tour", "Spa Treatment"] },
-  { id: 2, title: "Alpine Adventure", destination: "Swiss Alps", duration: "10 Days", image: "https://images.unsplash.com/photo-1531366936337-7c912a4589a7?w=800&q=80", price: 2499, highlights: ["Ski Pass", "Mountain Hiking", "Cable Car", "Fondue Dinner"] },
-  { id: 3, title: "Tokyo Discovery", destination: "Tokyo, Japan", duration: "5 Days", image: "https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?w=800&q=80", price: 1899, highlights: ["Bullet Train", "Sushi Masterclass", "Temple Visit", "Shopping Tour"] },
-  { id: 4, title: "Greek Island Hopper", destination: "Santorini, Greece", duration: "8 Days", image: "https://images.unsplash.com/photo-1570077188670-e3a8d69ac5ff?w=800&q=80", price: 2199, highlights: ["Island Cruise", "Wine Tasting", "Sunset Dinner", "Beach Club"] }
+  { id: 1, title: "Tokyo Discovery", destination: "Tokyo, Japan", duration: "5 Days", image: "https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?w=800&q=80", price: 1899, highlights: ["Bullet Train", "Sushi Masterclass", "Temple Visit", "Shopping Tour"] },
+  { id: 2, title: "Istanbul Heritage", destination: "Istanbul, Turkey", duration: "6 Days", image: "https://images.unsplash.com/photo-1524231757912-21f4fe3a7200?w=800&q=80", price: 1299, highlights: ["Hagia Sophia Tour", "Bosphorus Cruise", "Grand Bazaar", "Turkish Bath"] },
+  { id: 3, title: "Paris Romance", destination: "Paris, France", duration: "5 Days", image: "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=800&q=80", price: 2199, highlights: ["Eiffel Tower Dinner", "Louvre Museum", "Seine River Cruise", "Montmartre Walk"] },
+  { id: 4, title: "Maldives Paradise", destination: "Maldives", duration: "7 Days", image: "https://images.unsplash.com/photo-1514282401047-d79a71a590e8?w=800&q=80", price: 3499, highlights: ["Overwater Villa", "Snorkeling Safari", "Sunset Cruise", "Spa Treatment"] },
+  { id: 5, title: "Santorini Dreams", destination: "Santorini, Greece", duration: "6 Days", image: "https://images.unsplash.com/photo-1570077188670-e3a8d69ac5ff?w=800&q=80", price: 1899, highlights: ["Caldera Sunset", "Wine Tasting", "Volcanic Beach", "Oia Village"] },
+  { id: 6, title: "London Explorer", destination: "London, England", duration: "5 Days", image: "https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?w=800&q=80", price: 1699, highlights: ["Tower of London", "Westminster Abbey", "Thames Cruise", "West End Show"] }
 ];
 
 const testimonials = [
-  { id: 1, name: "Sarah", location: "Cairo, Egypt", avatar: "https://ui-avatars.com/api/?name=Sarah&background=e91e63&color=fff", rating: 5, text: "Escapeo made our honeymoon absolutely magical! The attention to detail and personalized service exceeded all expectations." },
-  { id: 2, name: "Muhammad", location: "Dubai, UAE", avatar: "https://ui-avatars.com/api/?name=Muhammad&background=2196f3&color=fff", rating: 5, text: "Best travel agency I've ever used. They found hidden gems we never would have discovered on our own. Truly unforgettable!" },
-  { id: 3, name: "Ali", location: "Riyadh, Saudi Arabia", avatar: "https://ui-avatars.com/api/?name=Ali&background=4caf50&color=fff", rating: 5, text: "From booking to return, everything was seamless. The local guides were knowledgeable and the accommodations were stunning." },
-  { id: 4, name: "Nour", location: "Amman, Jordan", avatar: "https://ui-avatars.com/api/?name=Nour&background=9c27b0&color=fff", rating: 5, text: "An absolutely wonderful experience! The team at Escapeo went above and beyond to make sure our family trip was perfect." },
-  { id: 5, name: "Nada", location: "Kuwait City, Kuwait", avatar: "https://ui-avatars.com/api/?name=Nada&background=ff9800&color=fff", rating: 5, text: "I have traveled with many agencies before, but Escapeo stands out for their professionalism and amazing customer care." },
-  { id: 6, name: "Yousef", location: "Doha, Qatar", avatar: "https://ui-avatars.com/api/?name=Yousef&background=00bcd4&color=fff", rating: 5, text: "The best vacation of my life! Everything was perfectly organized from flights to hotels to tours. Highly recommended!" }
+  { id: 1, name: "Sarah", location: "Cairo, Egypt", avatar: "https://ui-avatars.com/api/?name=Sarah&background=e91e63&color=fff", rating: 5, text: "Our trip to Paris was absolutely magical! Escapeo arranged everything perfectly from the Eiffel Tower dinner to the Seine cruise." },
+  { id: 2, name: "Muhammad", location: "Dubai, UAE", avatar: "https://ui-avatars.com/api/?name=Muhammad&background=2196f3&color=fff", rating: 5, text: "The Maldives package was a dream come true. The overwater villa and snorkeling safari exceeded all expectations!" },
+  { id: 3, name: "Ali", location: "Riyadh, Saudi Arabia", avatar: "https://ui-avatars.com/api/?name=Ali&background=4caf50&color=fff", rating: 5, text: "Istanbul was incredible! From the Hagia Sophia to the Grand Bazaar, every moment was perfectly organized by Escapeo." },
+  { id: 4, name: "Nour", location: "Amman, Jordan", avatar: "https://ui-avatars.com/api/?name=Nour&background=9c27b0&color=fff", rating: 5, text: "Our London family trip was perfect! The kids loved the Tower of London and we enjoyed the West End show. Thank you Escapeo!" },
+  { id: 5, name: "Nada", location: "Kuwait City, Kuwait", avatar: "https://ui-avatars.com/api/?name=Nada&background=ff9800&color=fff", rating: 5, text: "Santorini was breathtaking! The caldera sunset and wine tasting experience were highlights of our honeymoon." },
+  { id: 6, name: "Yousef", location: "Doha, Qatar", avatar: "https://ui-avatars.com/api/?name=Yousef&background=00bcd4&color=fff", rating: 5, text: "Tokyo was amazing! The bullet train, sushi masterclass, and temple visits created memories we'll cherish forever." }
 ];
 
 // ============================================
@@ -174,20 +159,6 @@ function initNavbar() {
     } else {
       navbar.classList.remove('scrolled');
     }
-  });
-
-  var langBtn = document.getElementById('langBtn');
-  var langDropdown = document.getElementById('langDropdown');
-  langBtn.addEventListener('click', function(e) {
-    e.stopPropagation();
-    langDropdown.classList.toggle('active');
-  });
-  document.addEventListener('click', function() { langDropdown.classList.remove('active'); });
-  langDropdown.querySelectorAll('a').forEach(function(a) {
-    a.addEventListener('click', function(e) {
-      e.preventDefault();
-      changeLanguage(a.dataset.lang);
-    });
   });
 
   var userMenu = document.getElementById('userMenu');
@@ -305,7 +276,7 @@ function handleGoogleCallback() {
 
 // ============================================
 // ROUTING
-// ============================================"
+// ============================================
 function router(page) {
   document.querySelectorAll('.page').forEach(function(p) { p.classList.add('hidden'); });
   document.getElementById('page-home').classList.add('hidden');
@@ -364,7 +335,7 @@ function renderDestinations(filter) {
         '</div>' +
         '<p class="destination-location">📍 ' + dest.location + ', ' + dest.country + '</p>' +
         '<div class="destination-footer">' +
-          '<div class="destination-price">From <strong>$' + dest.price + '</strong>/night</div>' +
+          '<div class="destination-price">From <strong>' + formatPriceShort(dest.price) + '</strong>/night</div>' +
           '<button class="btn btn-primary btn-sm" onclick="startBooking(' + dest.id + ')">Book Now</button>' +
         '</div>' +
       '</div>' +
@@ -390,7 +361,7 @@ function renderPackages() {
             pkg.highlights.map(function(h) { return '<li>' + h + '</li>'; }).join('') +
           '</ul>' +
           '<div class="package-footer">' +
-            '<div class="package-price">$' + pkg.price.toLocaleString() + '</div>' +
+            '<div class="package-price">' + formatPrice(pkg.price) + '</div>' +
             '<button class="btn btn-primary btn-sm" onclick="startBookingPackage(' + pkg.id + ')">Book Now</button>' +
           '</div>' +
         '</div>' +
@@ -458,7 +429,7 @@ function loadWishlist() {
         '</div>' +
         '<p class="destination-location">📍 ' + dest.location + '</p>' +
         '<div class="destination-footer">' +
-          '<div class="destination-price">From <strong>$' + dest.price + '</strong>/night</div>' +
+          '<div class="destination-price">From <strong>' + formatPriceShort(dest.price) + '</strong>/night</div>' +
           '<button class="btn btn-primary btn-sm" onclick="startBooking(' + dest.id + ')">Book Now</button>' +
         '</div>' +
       '</div>' +
@@ -550,8 +521,8 @@ function updateBookingSummary() {
     '<div class="summary-row"><span>Dates</span><span>' + (checkIn || 'Not selected') + ' to ' + (checkOut || 'Not selected') + '</span></div>' +
     '<div class="summary-row"><span>Travelers</span><span>' + adults + ' Adults, ' + children + ' Children</span></div>' +
     '<div class="summary-row"><span>Room Type</span><span>' + roomType.charAt(0).toUpperCase() + roomType.slice(1) + '</span></div>' +
-    extras.map(function(e) { return '<div class="summary-row"><span>' + e.name + '</span><span>+$' + e.price + '</span></div>'; }).join('') +
-    '<div class="summary-row"><span>Total</span><span>$' + total.toLocaleString() + '</span></div>';
+    extras.map(function(e) { return '<div class="summary-row"><span>' + e.name + '</span><span>+' + formatPriceShort(e.price) + '</span></div>'; }).join('') +
+    '<div class="summary-row"><span>Total</span><span>' + formatPrice(total) + '</span></div>';
 }
 
 function updateBookingTotal() {
@@ -559,7 +530,7 @@ function updateBookingTotal() {
   if (totalEl) {
     totalEl.innerHTML =
       '<div class="total-label">Total Amount</div>' +
-      '<div class="total-amount">$' + currentBooking.total.toLocaleString() + '</div>';
+      '<div class="total-amount">' + formatPrice(currentBooking.total) + '</div>';
   }
 }
 
@@ -620,8 +591,7 @@ function changePassword(e) {
 }
 
 function setCurrency(curr) {
-  localStorage.setItem('escapeo-currency', curr);
-  showToast('Currency set to ' + curr);
+  changeCurrency(curr);
 }
 
 // ============================================
@@ -647,7 +617,7 @@ function loadBookings() {
         '<p>📅 ' + (b.dates.checkIn || 'N/A') + ' to ' + (b.dates.checkOut || 'N/A') + '</p>' +
         '<p>👥 ' + b.travelers.adults + ' Adults, ' + b.travelers.children + ' Children</p>' +
       '</div>' +
-      '<div class="booking-price">$' + b.total.toLocaleString() + '</div>' +
+      '<div class="booking-price">' + formatPrice(b.total) + '</div>' +
       '<div class="booking-status status-' + b.status + '">' + b.status + '</div>' +
     '</div>';
   }).join('');
@@ -687,7 +657,7 @@ function destroyAdminCharts() {
 
 function loadAdminOverview() {
   document.getElementById('statTotalBookings').textContent = bookings.length;
-  document.getElementById('statRevenue').textContent = '$' + bookings.reduce(function(sum, b) { return sum + b.total; }, 0).toLocaleString();
+  document.getElementById('statRevenue').textContent = formatPrice(bookings.reduce(function(sum, b) { return sum + b.total; }, 0));
 
   destroyAdminCharts();
 
@@ -732,7 +702,7 @@ function loadAdminDestinations() {
     return '<tr>' +
       '<td>' + d.name + '</td>' +
       '<td>' + d.location + '</td>' +
-      '<td>$' + d.price + '</td>' +
+      '<td>' + formatPriceShort(d.price) + '</td>' +
       '<td><button class="btn btn-sm btn-outline" onclick="editDestination(' + d.id + ')">Edit</button></td>' +'</tr>';
   }).join('');
 }
@@ -846,12 +816,69 @@ function sendContact(e) {
 }
 
 function searchDestinations() {
-  var query = document.getElementById('searchDestination').value.toLowerCase();
-  var cards = document.querySelectorAll('.destination-card');
-  cards.forEach(function(card) {
-    var name = card.querySelector('.destination-name').textContent.toLowerCase();
-    card.style.display = name.indexOf(query) > -1 ? 'block' : 'none';
+  var query = document.getElementById('searchDestination').value.toLowerCase().trim();
+  var resultsContainer = document.getElementById('searchResults');
+
+  if (!query) {
+    resultsContainer.style.display = 'none';
+    resultsContainer.innerHTML = '';
+    renderDestinations('all');
+    return;
+  }
+
+  var matched = destinations.filter(function(d) {
+    return d.name.toLowerCase().indexOf(query) > -1 || 
+           d.location.toLowerCase().indexOf(query) > -1 ||
+           d.country.toLowerCase().indexOf(query) > -1;
   });
+
+  resultsContainer.style.display = 'block';
+
+  if (matched.length === 0) {
+    resultsContainer.innerHTML = 
+      '<div class="search-no-results">' +
+        '<div class="search-no-results-icon">🔍</div>' +
+        '<h3>No results found</h3>' +
+        '<p>Try a different city or country name</p>' +
+      '</div>';
+  } else {
+    var resultsHTML = 
+      '<div class="search-results-header">' +
+        '<h3>Search Results (' + matched.length + ')</h3>' +
+        '<div class="search-results-close" onclick="closeSearchResults()">✕</div>' +
+      '</div>' +
+      '<div class="search-results-grid">' +
+        matched.map(function(dest) {
+          return '<div class="search-result-item" onclick="startBooking(' + dest.id + '); closeSearchResults();">' +
+            '<img src="' + dest.image + '" alt="' + dest.name + '">' +
+            '<div class="search-result-info">' +
+              '<h4>' + dest.name + '</h4>' +
+              '<p>📍 ' + dest.location + ', ' + dest.country + '</p>' +
+              '<div class="price">' + formatPriceShort(dest.price) + '/night</div>' +
+            '</div>' +
+          '</div>';
+        }).join('') +
+      '</div>';
+    resultsContainer.innerHTML = resultsHTML;
+  }
+}
+
+function searchDestinationsLive(query) {
+  var resultsContainer = document.getElementById('searchResults');
+  if (!query || query.trim().length < 1) {
+    resultsContainer.style.display = 'none';
+    resultsContainer.innerHTML = '';
+    renderDestinations('all');
+    return;
+  }
+  searchDestinations();
+}
+
+function closeSearchResults() {
+  document.getElementById('searchResults').style.display = 'none';
+  document.getElementById('searchResults').innerHTML = '';
+  document.getElementById('searchDestination').value = '';
+  renderDestinations('all');
 }
 
 // ============================================
@@ -860,15 +887,15 @@ function searchDestinations() {
 document.addEventListener('DOMContentLoaded', function() {
   // Handle Google OAuth callback if present in URL
   handleGoogleCallback();
-  
+
   setTimeout(function() {
     document.getElementById('loader').classList.add('hidden');
   }, 1500);
 
   initNavbar();
+  initCurrencySwitcher();
   updateAuthUI();
   updateGreeting();
-  changeLanguage(currentLang);
 
   renderDestinations();
   renderPackages();

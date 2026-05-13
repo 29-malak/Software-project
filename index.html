@@ -9,12 +9,14 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css">
 <base target="_blank">
 <base target="_blank">
+<base target="_blank">
+<base target="_blank">
 </head>
 <body>
     <!-- Loading Screen -->
     <div id="loader" class="loader">
         <div class="loader-content">
-            <h1 class="loader-logo">Escapeo</h1>
+            <img src="logo.png" alt="Escapeo" class="loader-logo-img" style="height:60px;width:auto;margin-bottom:1.5rem;">
             <div class="loader-bar"><div class="loader-progress"></div></div>
         </div>
     </div>
@@ -23,7 +25,7 @@
     <nav id="navbar" class="navbar">
         <div class="nav-container">
             <a href="#" class="logo" onclick="router('home')">
-                <span class="logo-icon">✈</span> Escapeo
+                <img src="logo.png" alt="Escapeo" class="logo-img" style="height:40px;width:auto;margin-right:8px;"> Escapeo
             </a>
             <ul class="nav-links" id="navLinks">
                 <li><a href="#destinations" data-i18n="nav.destinations">Destinations</a></li>
@@ -33,15 +35,11 @@
                 <li><a href="#contact" data-i18n="nav.contact">Contact</a></li>
             </ul>
             <div class="nav-actions">
-                <div class="lang-switcher">
-                    <button class="lang-btn" id="langBtn">EN ▼</button>
-                    <div class="lang-dropdown" id="langDropdown">
-                        <a href="#" data-lang="en">🇺🇸 English</a>
-                        <a href="#" data-lang="es">🇪🇸 Español</a>
-                        <a href="#" data-lang="fr">🇫🇷 Français</a>
-                        <a href="#" data-lang="de">🇩🇪 Deutsch</a>
-                        <a href="#" data-lang="ja">🇯🇵 日本語</a>
-                        <a href="#" data-lang="ar">🇸🇦 العربية</a>
+                <div class="currency-switcher" id="currencySwitcher">
+                    <button class="currency-btn" id="currencyBtn">$ ▼</button>
+                    <div class="currency-dropdown" id="currencyDropdown">
+                        <a href="#" data-currency="USD">$ USD</a>
+                        <a href="#" data-currency="EGP">ج.م EGP</a>
                     </div>
                 </div>
                 <div class="auth-section" id="authSection">
@@ -96,30 +94,22 @@
 
                     <div class="search-box">
                         <div class="search-field">
-                            <label>📍 Destination</label>
-                            <input type="text" placeholder="Where to?" id="searchDestination">
+                            <label data-i18n="hero.search_destination_label">📍 Destination</label>
+                            <input type="text" placeholder="Where to?" id="searchDestination" data-i18n-placeholder="hero.search_destination_placeholder" onkeyup="searchDestinationsLive(this.value)">
                         </div>
-                        <div class="search-field">
-                            <label>📅 Dates</label>
-                            <input type="date" id="searchDates">
-                        </div>
-                        <div class="search-field">
-                            <label>👥 Travelers</label>
-                            <select id="searchTravelers">
-                                <option>1 Traveler</option>
-                                <option>2 Travelers</option>
-                                <option>3-4 Travelers</option>
-                                <option>5+ Travelers</option>
-                            </select>
-                        </div>
-                        <button class="btn btn-primary btn-lg" onclick="searchDestinations()">
+                        <button class="btn btn-primary btn-lg" onclick="searchDestinations()" data-i18n="hero.search_button">
                             <span>🔍</span> Search
                         </button>
                     </div>
+                    <div id="searchResults" class="search-results" style="display:none; max-width: 900px; margin-bottom: 3rem;"></div>
+
+                    
+
+                    
 
                     <div class="hero-stats">
                         <div class="stat-card">
-                            <span class="stat-number" data-count="50">0</span>
+                            <span class="stat-number" data-count="12">0</span>
                             <span class="stat-label">Destinations</span>
                         </div>
                         <div class="stat-card">
@@ -372,23 +362,7 @@
                                 </div>
                                 <select id="prefCurrency" onchange="setCurrency(this.value)">
                                     <option value="USD">$ USD</option>
-                                    <option value="EUR">€ EUR</option>
-                                    <option value="GBP">£ GBP</option>
-                                    <option value="JPY">¥ JPY</option>
-                                </select>
-                            </div>
-                            <div class="preference-item">
-                                <div>
-                                    <h4>Language</h4>
-                                    <p>Choose your language</p>
-                                </div>
-                                <select id="prefLanguage" onchange="changeLanguage(this.value)">
-                                    <option value="en">English</option>
-                                    <option value="es">Español</option>
-                                    <option value="fr">Français</option>
-                                    <option value="de">Deutsch</option>
-                                    <option value="ja">日本語</option>
-                                    <option value="ar">العربية</option>
+                                    <option value="EGP">ج.م EGP</option>
                                 </select>
                             </div>
                             <div class="preference-item">
@@ -525,7 +499,7 @@
             <div class="footer-grid">
                 <div class="footer-brand">
                     <a href="#" class="logo" onclick="router('home')">
-                        <span class="logo-icon">✈</span> Escapeo
+                        <img src="logo.png" alt="Escapeo" class="logo-img" style="height:40px;width:auto;margin-right:8px;"> Escapeo
                     </a>
                     <p>Your gateway to extraordinary adventures. We craft unforgettable travel experiences around the globe.</p>
                     <div class="social-links">
@@ -544,10 +518,10 @@
                 </div>
                 <div class="footer-links">
                     <h4>Destinations</h4>
-                    <a href="#">Bali</a>
-                    <a href="#">Santorini</a>
-                    <a href="#">Kyoto</a>
-                    <a href="#">Swiss Alps</a>
+                    <a href="#">Tokyo</a>
+                    <a href="#">Paris</a>
+                    <a href="#">Maldives</a>
+                    <a href="#">London</a>
                 </div>
                 <div class="footer-links">
                     <h4>Contact</h4>
