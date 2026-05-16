@@ -7,10 +7,7 @@
     <link rel="stylesheet" href="styles.css">
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css">
-<base target="_blank">
-<base target="_blank">
-<base target="_blank">
-<base target="_blank">
+    <!-- NO base target="_blank" — removed, was causing all links to open in new tabs -->
 </head>
 <body>
     <!-- Loading Screen -->
@@ -24,36 +21,36 @@
     <!-- Navigation -->
     <nav id="navbar" class="navbar">
         <div class="nav-container">
-            <a href="#" class="logo" onclick="router('home')">
+            <a href="javascript:void(0)" class="logo" onclick="router('home'); return false;">
                 <img src="logo.png" alt="Escapeo" class="logo-img" style="height:40px;width:auto;margin-right:8px;"> Escapeo
             </a>
             <ul class="nav-links" id="navLinks">
-                <li><a href="#destinations" data-i18n="nav.destinations">Destinations</a></li>
-                <li><a href="#packages" data-i18n="nav.packages">Packages</a></li>
-                <li><a href="#about" data-i18n="nav.about">About</a></li>
-                <li><a href="#testimonials" data-i18n="nav.testimonials">Testimonials</a></li>
-                <li><a href="#contact" data-i18n="nav.contact">Contact</a></li>
+                <li><a href="#destinations">Destinations</a></li>
+                <li><a href="#packages">Packages</a></li>
+                <li><a href="#about">About</a></li>
+                <li><a href="#testimonials">Testimonials</a></li>
+                <li><a href="#contact">Contact</a></li>
             </ul>
             <div class="nav-actions">
                 <div class="currency-switcher" id="currencySwitcher">
                     <button class="currency-btn" id="currencyBtn">$ ▼</button>
                     <div class="currency-dropdown" id="currencyDropdown">
-                        <a href="#" data-currency="USD">$ USD</a>
-                        <a href="#" data-currency="EGP">ج.م EGP</a>
+                        <a href="javascript:void(0)" data-currency="USD">$ USD</a>
+                        <a href="javascript:void(0)" data-currency="EGP">ج.م EGP</a>
                     </div>
                 </div>
                 <div class="auth-section" id="authSection">
-                    <button class="btn btn-ghost" onclick="openModal('loginModal')" data-i18n="nav.login">Sign In</button>
-                    <button class="btn btn-primary" onclick="openModal('registerModal')" data-i18n="nav.register">Sign Up</button>
+                    <button class="btn btn-ghost" onclick="openModal('loginModal')">Sign In</button>
+                    <button class="btn btn-primary" onclick="openModal('registerModal')">Sign Up</button>
                 </div>
                 <div class="user-menu hidden" id="userMenu">
                     <img src="https://ui-avatars.com/api/?name=User&background=3B82F6&color=fff" class="user-avatar" id="userAvatar" alt="User">
                     <div class="user-dropdown" id="userDropdown">
-                        <a href="#" onclick="router('profile')"><span>👤</span> <span data-i18n="user.profile">Profile</span></a>
-                        <a href="#" onclick="router('bookings')"><span>📋</span> <span data-i18n="user.bookings">My Bookings</span></a>
-                        <a href="#" onclick="router('wishlist')"><span>❤️</span> <span data-i18n="user.wishlist">Wishlist</span></a>
+                        <a href="javascript:void(0)" onclick="router('profile'); return false;"><span>👤</span> Profile</a>
+                        <a href="javascript:void(0)" onclick="router('bookings'); return false;"><span>📋</span> My Bookings</a>
+                        <a href="javascript:void(0)" onclick="router('wishlist'); return false;"><span>❤️</span> Wishlist</a>
                         <hr>
-                        <a href="#" onclick="logout()" class="text-danger"><span>🚪</span> <span data-i18n="user.logout">Logout</span></a>
+                        <a href="javascript:void(0)" onclick="logout(); return false;" class="text-danger"><span>🚪</span> Logout</a>
                     </div>
                 </div>
                 <button class="hamburger" id="hamburger">☰</button>
@@ -65,22 +62,21 @@
     <div class="mobile-menu" id="mobileMenu">
         <button class="mobile-close" id="mobileClose">✕</button>
         <div class="mobile-links">
-            <a href="#destinations" onclick="closeMobileMenu()">Destinations</a>
-            <a href="#packages" onclick="closeMobileMenu()">Packages</a>
-            <a href="#about" onclick="closeMobileMenu()">About</a>
-            <a href="#testimonials" onclick="closeMobileMenu()">Testimonials</a>
-            <a href="#contact" onclick="closeMobileMenu()">Contact</a>
+            <a href="#destinations" onclick="document.getElementById('mobileMenu').classList.remove('active')">Destinations</a>
+            <a href="#packages" onclick="document.getElementById('mobileMenu').classList.remove('active')">Packages</a>
+            <a href="#about" onclick="document.getElementById('mobileMenu').classList.remove('active')">About</a>
+            <a href="#testimonials" onclick="document.getElementById('mobileMenu').classList.remove('active')">Testimonials</a>
+            <a href="#contact" onclick="document.getElementById('mobileMenu').classList.remove('active')">Contact</a>
         </div>
     </div>
 
     <!-- Toast Container -->
     <div class="toast-container" id="toastContainer"></div>
 
-    <!-- MAIN CONTENT AREA -->
     <main id="mainContent">
 
         <!-- HOME PAGE -->
-        <div id="page-home">
+        <div id="page-home" class="page">
             <!-- Hero Section -->
             <section class="hero">
                 <div class="hero-bg">
@@ -89,41 +85,23 @@
                 </div>
                 <div class="hero-content">
                     <p class="hero-greeting" id="heroGreeting">Good morning, traveler!</p>
-                    <h1 class="hero-title" data-i18n="hero.title">Discover Your Next<br><span class="text-gradient">Adventure</span></h1>
-                    <p class="hero-subtitle" data-i18n="hero.subtitle">Explore breathtaking destinations, create unforgettable memories, and escape to paradise.</p>
-
+                    <h1 class="hero-title">Discover Your Next<br><span class="text-gradient">Adventure</span></h1>
+                    <p class="hero-subtitle">Explore breathtaking destinations, create unforgettable memories, and escape to paradise.</p>
                     <div class="search-box">
                         <div class="search-field">
-                            <label data-i18n="hero.search_destination_label">📍 Destination</label>
-                            <input type="text" placeholder="Where to?" id="searchDestination" data-i18n-placeholder="hero.search_destination_placeholder" onkeyup="searchDestinationsLive(this.value)">
+                            <label>📍 Destination</label>
+                            <input type="text" placeholder="Where to?" id="searchDestination" onkeyup="searchDestinationsLive(this.value)">
                         </div>
-                        <button class="btn btn-primary btn-lg" onclick="searchDestinations()" data-i18n="hero.search_button">
+                        <button class="btn btn-primary btn-lg" onclick="searchDestinations()">
                             <span>🔍</span> Search
                         </button>
                     </div>
-                    <div id="searchResults" class="search-results" style="display:none; max-width: 900px; margin-bottom: 3rem;"></div>
-
-                    
-
-                    
-
+                    <div id="searchResults" class="search-results" style="display:none; max-width:900px; margin-bottom:3rem;"></div>
                     <div class="hero-stats">
-                        <div class="stat-card">
-                            <span class="stat-number" data-count="12">0</span>
-                            <span class="stat-label">Destinations</span>
-                        </div>
-                        <div class="stat-card">
-                            <span class="stat-number" data-count="12000">0</span>
-                            <span class="stat-label">Happy Travelers</span>
-                        </div>
-                        <div class="stat-card">
-                            <span class="stat-number" data-count="500">0</span>
-                            <span class="stat-label">Tours</span>
-                        </div>
-                        <div class="stat-card">
-                            <span class="stat-number" data-count="15">0</span>
-                            <span class="stat-label">Years Experience</span>
-                        </div>
+                        <div class="stat-card"><span class="stat-number" data-count="12">0</span><span class="stat-label">Destinations</span></div>
+                        <div class="stat-card"><span class="stat-number" data-count="12000">0</span><span class="stat-label">Happy Travelers</span></div>
+                        <div class="stat-card"><span class="stat-number" data-count="500">0</span><span class="stat-label">Tours</span></div>
+                        <div class="stat-card"><span class="stat-number" data-count="15">0</span><span class="stat-label">Years Experience</span></div>
                     </div>
                 </div>
             </section>
@@ -132,9 +110,9 @@
             <section class="section" id="destinations">
                 <div class="container">
                     <div class="section-header">
-                        <span class="section-tag" data-i18n="destinations.tag">Popular Destinations</span>
-                        <h2 class="section-title" data-i18n="destinations.title">Explore the World</h2>
-                        <p class="section-subtitle" data-i18n="destinations.subtitle">Handpicked destinations for your next escape</p>
+                        <span class="section-tag">Popular Destinations</span>
+                        <h2 class="section-title">Explore the World</h2>
+                        <p class="section-subtitle">Handpicked destinations for your next escape</p>
                     </div>
                     <div class="filter-tabs" id="destinationTabs">
                         <button class="filter-tab active" data-filter="all">All</button>
@@ -151,9 +129,9 @@
             <section class="section section-alt" id="packages">
                 <div class="container">
                     <div class="section-header">
-                        <span class="section-tag" data-i18n="packages.tag">Travel Packages</span>
-                        <h2 class="section-title" data-i18n="packages.title">Curated Experiences</h2>
-                        <p class="section-subtitle" data-i18n="packages.subtitle">All-inclusive packages designed for unforgettable journeys</p>
+                        <span class="section-tag">Travel Packages</span>
+                        <h2 class="section-title">Curated Experiences</h2>
+                        <p class="section-subtitle">All-inclusive packages designed for unforgettable journeys</p>
                     </div>
                     <div class="swiper packages-swiper">
                         <div class="swiper-wrapper" id="packagesWrapper"></div>
@@ -164,7 +142,7 @@
                 </div>
             </section>
 
-            <!-- Why Choose Us -->
+            <!-- About / Why Us -->
             <section class="section" id="about">
                 <div class="container">
                     <div class="section-header">
@@ -172,29 +150,14 @@
                         <h2 class="section-title">Your Journey, Our Passion</h2>
                     </div>
                     <div class="features-grid">
-                        <div class="feature-card">
-                            <div class="feature-icon">🗺</div>
-                            <h3>Expert Guides</h3>
-                            <p>Local experts who know every hidden gem and secret spot in your destination.</p>
-                        </div>
-                        <div class="feature-card">
-                            <div class="feature-icon">💰</div>
-                            <h3>Best Prices</h3>
-                            <p>We guarantee the best rates with our price match promise on all bookings.</p>
-                        </div>
-                        <div class="feature-card">
-                            <div class="feature-icon">🛡</div>
-                            <h3>24/7 Support</h3>
-                            <p>Round-the-clock assistance wherever you are in the world, whenever you need it.</p>
-                        </div>
-                        <div class="feature-card">
-                            <div class="feature-icon">✨</div>
-                            <h3>Custom Itineraries</h3>
-                            <p>Tailor-made trips designed around your dreams, preferences, and travel style.</p>
-                        </div>
+                        <div class="feature-card"><div class="feature-icon">🗺</div><h3>Expert Guides</h3><p>Local experts who know every hidden gem and secret spot in your destination.</p></div>
+                        <div class="feature-card"><div class="feature-icon">💰</div><h3>Best Prices</h3><p>We guarantee the best rates with our price match promise on all bookings.</p></div>
+                        <div class="feature-card"><div class="feature-icon">🛡</div><h3>24/7 Support</h3><p>Round-the-clock assistance wherever you are in the world, whenever you need it.</p></div>
+                        <div class="feature-card"><div class="feature-icon">✨</div><h3>Custom Itineraries</h3><p>Tailor-made trips designed around your dreams, preferences, and travel style.</p></div>
                     </div>
                 </div>
             </section>
+
             <!-- Testimonials -->
             <section class="section section-gradient" id="testimonials">
                 <div class="container">
@@ -213,7 +176,7 @@
                         <div class="newsletter-content">
                             <h2>Get 15% Off Your First Booking</h2>
                             <p>Subscribe to our newsletter for exclusive deals, travel tips, and destination inspiration.</p>
-                            <form class="newsletter-form" onsubmit="subscribeNewsletter(event)">
+                            <form class="newsletter-form" id="newsletterForm" onsubmit="subscribeNewsletter(event)">
                                 <input type="email" placeholder="Enter your email" required id="newsletterEmail">
                                 <button type="submit" class="btn btn-primary btn-lg">Subscribe</button>
                             </form>
@@ -234,47 +197,21 @@
                         <p class="section-subtitle">We would love to hear from you</p>
                     </div>
                     <div class="contact-modern-wrapper">
-                        <!-- Contact Info Cards -->
                         <div class="contact-info-modern">
-                            <div class="contact-card-modern">
-                                <div class="contact-card-icon">📍</div>
-                                <h4>Visit Us</h4>
-                                <p>212 New Cairo<br>Cairo, Egypt</p>
-                            </div>
-                            <div class="contact-card-modern">
-                                <div class="contact-card-icon">📞</div>
-                                <h4>Call Us</h4>
-                                <p>0115955275<br>Sun-Thu 9am-6pm</p>
-                            </div>
-                            <div class="contact-card-modern">
-                                <div class="contact-card-icon">✉</div>
-                                <h4>Email Us</h4>
-                                <p>escapeo@gmail.com<br>We reply within 24h</p>
-                            </div>
+                            <div class="contact-card-modern"><div class="contact-card-icon">📍</div><h4>Visit Us</h4><p>212 New Cairo<br>Cairo, Egypt</p></div>
+                            <div class="contact-card-modern"><div class="contact-card-icon">📞</div><h4>Call Us</h4><p>01159559275<br>Sun-Thu 9am-6pm</p></div>
+                            <div class="contact-card-modern"><div class="contact-card-icon">✉</div><h4>Email Us</h4><p>escapeo@gmail.com<br>We reply within 24h</p></div>
                         </div>
-                        <!-- Modern Contact Form -->
                         <div class="contact-form-modern-card">
                             <div class="contact-form-header">
                                 <h3>Send a Message</h3>
                                 <p>Fill out the form below and we will get back to you shortly</p>
                             </div>
-                            <form class="contact-form-modern" onsubmit="sendContact(event)">
-                                <div class="form-group-modern">
-                                    <label for="contactName">Full Name</label>
-                                    <input type="text" id="contactName" placeholder="John Doe" required>
-                                </div>
-                                <div class="form-group-modern">
-                                    <label for="contactEmail">Email Address</label>
-                                    <input type="email" id="contactEmail" placeholder="john@example.com" required>
-                                </div>
-                                <div class="form-group-modern">
-                                    <label for="contactSubject">Subject</label>
-                                    <input type="text" id="contactSubject" placeholder="How can we help?">
-                                </div>
-                                <div class="form-group-modern">
-                                    <label for="contactMessage">Your Message</label>
-                                    <textarea id="contactMessage" rows="4" placeholder="Tell us about your travel plans..." required></textarea>
-                                </div>
+                            <form class="contact-form-modern" id="contactForm" onsubmit="sendContact(event)">
+                                <div class="form-group-modern"><label>Full Name</label><input type="text" id="contactName" placeholder="John Doe" required></div>
+                                <div class="form-group-modern"><label>Email Address</label><input type="email" id="contactEmail" placeholder="john@example.com" required></div>
+                                <div class="form-group-modern"><label>Subject</label><input type="text" id="contactSubject" placeholder="How can we help?"></div>
+                                <div class="form-group-modern"><label>Your Message</label><textarea id="contactMessage" rows="4" placeholder="Tell us about your travel plans..." required></textarea></div>
                                 <button type="submit" class="btn-contact-send">
                                     <span>Send Message</span>
                                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
@@ -285,15 +222,11 @@
                 </div>
             </section>
         </div>
+        <!-- END HOME PAGE -->
 
         <!-- PROFILE PAGE -->
         <div id="page-profile" class="page hidden">
-            <div class="page-header">
-                <div class="container">
-                    <h1>My Profile</h1>
-                    <p>Manage your account and preferences</p>
-                </div>
-            </div>
+            <div class="page-header"><div class="container"><h1>My Profile</h1><p>Manage your account and preferences</p></div></div>
             <div class="container page-content">
                 <div class="profile-layout">
                     <div class="profile-sidebar">
@@ -304,76 +237,47 @@
                             <span class="badge" id="profileRole">Customer</span>
                         </div>
                         <nav class="profile-nav">
-                            <a href="#" class="active" onclick="showProfileTab('info')">👤 Personal Info</a>
-                            <a href="#" onclick="showProfileTab('security')">🔒 Security</a>
-                            <a href="#" onclick="showProfileTab('preferences')">⚙ Preferences</a>
+                            <a href="javascript:void(0)" class="active" onclick="showProfileTab('info', event); return false;">👤 Personal Info</a>
+                            <a href="javascript:void(0)" onclick="showProfileTab('bookings', event); return false;">📋 My Bookings</a>
+                            <a href="javascript:void(0)" onclick="showProfileTab('security', event); return false;">🔒 Security</a>
+                            <a href="javascript:void(0)" onclick="showProfileTab('preferences', event); return false;">⚙ Preferences</a>
                         </nav>
                     </div>
                     <div class="profile-main">
                         <div id="tab-info" class="profile-tab">
                             <h2>Personal Information</h2>
-                            <form class="profile-form" onsubmit="updateProfile(event)">
+                            <form class="profile-form" id="profileForm">
                                 <div class="form-row">
-                                    <div class="form-group">
-                                        <label>First Name</label>
-                                        <input type="text" id="editFirstName">
-                                    </div>
-                                    <div class="form-group">
-                                        <label>Last Name</label>
-                                        <input type="text" id="editLastName">
-                                    </div>
+                                    <div class="form-group"><label>First Name</label><input type="text" id="editFirstName"></div>
+                                    <div class="form-group"><label>Last Name</label><input type="text" id="editLastName"></div>
                                 </div>
-                                <div class="form-group">
-                                    <label>Email</label>
-                                    <input type="email" id="editEmail" disabled>
-                                </div>
-                                <div class="form-group">
-                                    <label>Phone</label>
-                                    <input type="tel" id="editPhone" placeholder="+1 (555) 000-0000">
-                                </div>
+                                <div class="form-group"><label>Email</label><input type="email" id="editEmail" disabled></div>
+                                <div class="form-group"><label>Phone</label><input type="tel" id="editPhone" placeholder="+1 (555) 000-0000"></div>
                                 <button type="submit" class="btn btn-primary">Save Changes</button>
                             </form>
                         </div>
+                        <div id="tab-bookings" class="profile-tab hidden">
+                            <h2>My Bookings</h2>
+                            <div id="profileBookingsList" class="bookings-list"></div>
+                        </div>
                         <div id="tab-security" class="profile-tab hidden">
                             <h2>Change Password</h2>
-                            <form class="profile-form" onsubmit="changePassword(event)">
-                                <div class="form-group">
-                                    <label>Current Password</label>
-                                    <input type="password" required>
-                                </div>
-                                <div class="form-group">
-                                    <label>New Password</label>
-                                    <input type="password" id="newPassword" required>
-                                    <div class="password-strength" id="passwordStrength"></div>
-                                </div>
-                                <div class="form-group">
-                                    <label>Confirm New Password</label>
-                                    <input type="password" required>
-                                </div>
+                            <form class="profile-form" id="passwordForm">
+                                <div class="form-group"><label>Current Password</label><input type="password" id="currentPassword" required></div>
+                                <div class="form-group"><label>New Password</label><input type="password" id="newPassword" required><div class="password-strength" id="passwordStrength"></div></div>
+                                <div class="form-group"><label>Confirm New Password</label><input type="password" id="confirmNewPassword" required></div>
                                 <button type="submit" class="btn btn-primary">Update Password</button>
                             </form>
                         </div>
                         <div id="tab-preferences" class="profile-tab hidden">
                             <h2>Preferences</h2>
                             <div class="preference-item">
-                                <div>
-                                    <h4>Currency</h4>
-                                    <p>Select your preferred currency</p>
-                                </div>
-                                <select id="prefCurrency" onchange="setCurrency(this.value)">
-                                    <option value="USD">$ USD</option>
-                                    <option value="EGP">ج.م EGP</option>
-                                </select>
+                                <div><h4>Currency</h4><p>Select your preferred currency</p></div>
+                                <select id="prefCurrency"><option value="USD">$ USD</option><option value="EGP">ج.م EGP</option></select>
                             </div>
                             <div class="preference-item">
-                                <div>
-                                    <h4>Newsletter</h4>
-                                    <p>Receive travel deals and tips</p>
-                                </div>
-                                <label class="toggle">
-                                    <input type="checkbox" checked>
-                                    <span class="toggle-slider"></span>
-                                </label>
+                                <div><h4>Newsletter</h4><p>Receive travel deals and tips</p></div>
+                                <label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label>
                             </div>
                         </div>
                     </div>
@@ -383,12 +287,7 @@
 
         <!-- BOOKINGS PAGE -->
         <div id="page-bookings" class="page hidden">
-            <div class="page-header">
-                <div class="container">
-                    <h1>My Bookings</h1>
-                    <p>Track and manage your travel reservations</p>
-                </div>
-            </div>
+            <div class="page-header"><div class="container"><h1>My Bookings</h1><p>Track and manage your travel reservations</p></div></div>
             <div class="container page-content">
                 <div class="bookings-filters">
                     <button class="filter-pill active" data-status="all">All</button>
@@ -403,12 +302,7 @@
 
         <!-- WISHLIST PAGE -->
         <div id="page-wishlist" class="page hidden">
-            <div class="page-header">
-                <div class="container">
-                    <h1>My Wishlist</h1>
-                    <p>Destinations you have saved for later</p>
-                </div>
-            </div>
+            <div class="page-header"><div class="container"><h1>My Wishlist</h1><p>Destinations you have saved for later</p></div></div>
             <div class="container page-content">
                 <div class="destinations-grid" id="wishlistGrid"></div>
             </div>
@@ -417,80 +311,87 @@
         <!-- ADMIN DASHBOARD -->
         <div id="page-admin" class="page hidden">
             <div class="admin-container">
-                <!-- SIDEBAR -->
                 <div class="admin-sidebar">
                     <h2>Admin Panel</h2>
-                    <a href="#" onclick="showAdminTab('overview')">Overview</a>
-                    <a href="#" onclick="showAdminTab('destinations')">Destinations</a>
-                    <a href="#" onclick="showAdminTab('add')">Add Destination</a>
-                    <a href="#" onclick="showAdminTab('analytics')">Analytics</a>
+                    <nav class="admin-nav">
+                        <a href="javascript:void(0)" onclick="showAdminTab('overview', event); return false;">📊 Overview</a>
+                        <a href="javascript:void(0)" onclick="showAdminTab('bookings', event); return false;">📋 Bookings</a>
+                        <a href="javascript:void(0)" onclick="showAdminTab('destinations', event); return false;">🗺 Destinations</a>
+                        <a href="javascript:void(0)" onclick="showAdminTab('add', event); return false;">➕ Add Destination</a>
+                    </nav>
                 </div>
-
-                <!-- CONTENT -->
                 <div class="admin-content">
-                    <!-- OVERVIEW -->
-                    <div id="admin-overview" class="admin-tab">
+                    <div id="admin-tab-overview" class="admin-tab">
                         <h2>Overview</h2>
-                        <div class="stats">
-                            <div class="card">Bookings: <span id="statTotalBookings">0</span></div>
-                            <div class="card">Revenue: <span id="statRevenue">$0</span></div>
+                        <div class="admin-stats-grid">
+                            <div class="stat-card"><div class="stat-icon">💰</div><div class="stat-info"><p>Total Revenue</p><h3 id="adminTotalRevenue">$0</h3></div></div>
+                            <div class="stat-card"><div class="stat-icon">📋</div><div class="stat-info"><p>Total Bookings</p><h3 id="adminTotalBookings">0</h3></div></div>
+                            <div class="stat-card"><div class="stat-icon">👥</div><div class="stat-info"><p>Total Customers</p><h3 id="adminTotalCustomers">0</h3></div></div>
+                            <div class="stat-card"><div class="stat-icon">⏳</div><div class="stat-info"><p>Pending</p><h3 id="adminPendingBookings">0</h3></div></div>
                         </div>
-                        <canvas id="bookingsChart"></canvas>
-                        <canvas id="revenueChart"></canvas>
+                        <div class="chart-card" style="margin-top: 2rem;">
+                            <h3 style="margin-bottom:1.5rem;">🏆 Top Destinations</h3>
+                            <div id="topDestinationsChart"></div>
+                        </div>
                     </div>
-
-                    <!-- DESTINATIONS TABLE -->
-                    <div id="admin-destinations" class="admin-tab hidden">
+                    <div id="admin-tab-bookings" class="admin-tab hidden">
+                        <h2>All Bookings</h2>
+                        <div class="admin-toolbar">
+                            <input type="text" class="search-input" id="adminBookingsSearch" placeholder="Search bookings..." onkeyup="filterAdminBookings()">
+                        </div>
+                        <div class="data-table-wrapper">
+                            <table class="data-table" id="adminBookingsTable">
+                                <thead><tr><th>Ref #</th><th>Customer</th><th>Destination/Package</th><th>Dates</th><th>Travelers</th><th>Total</th><th>Status</th><th>Actions</th></tr></thead>
+                                <tbody id="adminBookingsList"><tr><td colspan="8" style="text-align:center;padding:2rem;">Loading...</td></tr></tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div id="admin-tab-destinations" class="admin-tab hidden">
                         <h2>Destinations</h2>
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>Name</th>
-                                    <th>Location</th>
-                                    <th>Price</th>
-                                    <th>Action</th>
-                                </tr>
-                            </thead>
-                            <tbody id="adminDestinationsTable"></tbody>
-                        </table>
+                        <div class="data-table-wrapper">
+                            <table class="data-table">
+                                <thead><tr><th>Name</th><th>Location</th><th>Category</th><th>Price</th><th>Action</th></tr></thead>
+                                <tbody id="adminDestinationsTable"></tbody>
+                            </table>
+                        </div>
                     </div>
-
-                    <!-- ADD DESTINATION -->
-                    <div id="admin-add" class="admin-tab hidden">
+                    <div id="admin-tab-add" class="admin-tab hidden">
                         <h2>Add New Destination</h2>
-                        <form onsubmit="addDestination(event)" class="admin-form" enctype="multipart/form-data">
-                            <input id="destName" placeholder="Name" required />
-                            <input id="destLocation" placeholder="Location" required />
-                            <input id="destCountry" placeholder="Country" required />
-                            <input id="destPrice" type="number" placeholder="Price" required />
-                            <div class="file-upload-wrapper">
-                                <label for="destImageFile" class="file-upload-label">
-                                    <span class="file-upload-icon">📁</span>
-                                    <span class="file-upload-text">Choose Destination Photo</span>
-                                </label>
-                                <input type="file" id="destImageFile" accept="image/*" required onchange="previewImage(this)" />
-                                <div class="file-preview" id="imagePreview"></div>
+                        <form onsubmit="addDestination(event)" class="admin-form">
+                            <div class="form-group"><label>Name</label><input id="destName" placeholder="e.g. Bali" required /></div>
+                            <div class="form-group"><label>Location</label><input id="destLocation" placeholder="e.g. Indonesia" required /></div>
+                            <div class="form-group"><label>Country</label><input id="destCountry" placeholder="e.g. Indonesia" required /></div>
+                            <div class="form-group"><label>Price per Night ($)</label><input id="destPrice" type="number" placeholder="150" required /></div>
+                            <div class="form-group">
+                                <label>Category</label>
+                                <select id="destCategory">
+                                    <option value="beach">Beach</option>
+                                    <option value="city">City</option>
+                                    <option value="mountain">Mountain</option>
+                                    <option value="cultural">Cultural</option>
+                                </select>
                             </div>
-                            <input type="hidden" id="destImage" />
-                            <select id="destCategory">
-                                <option value="beach">Beach</option>
-                                <option value="city">City</option>
-                                <option value="mountain">Mountain</option>
-                                <option value="cultural">Cultural</option>
-                            </select>
-                            <button type="submit">Add Destination</button>
+                            <div class="form-group">
+                                <label>Destination Image</label>
+                                <div class="image-upload-area" id="imageUploadArea" onclick="document.getElementById('destImageFile').click()">
+                                    <div class="image-upload-placeholder" id="imageUploadPlaceholder">
+                                        <span class="upload-icon">📷</span>
+                                        <p>Click to upload image from device</p>
+                                        <span class="upload-hint">JPG, PNG, WEBP supported</span>
+                                    </div>
+                                    <img id="imagePreview" class="image-preview hidden" alt="Preview" />
+                                </div>
+                                <input type="file" id="destImageFile" accept="image/*" style="display:none" onchange="previewDestImage(this)" />
+                                <div class="image-url-divider"><span>or paste image URL</span></div>
+                                <input id="destImage" type="url" placeholder="https://images.unsplash.com/..." oninput="previewDestImageUrl(this.value)" />
+                            </div>
+                            <button type="submit" class="btn btn-primary">Add Destination</button>
                         </form>
-                    </div>
-
-                    <!-- ANALYTICS -->
-                    <div id="admin-analytics" class="admin-tab hidden">
-                        <h2>Analytics</h2>
-                        <canvas id="monthlyRevenueChart"></canvas>
-                        <canvas id="popularDestinationsChart"></canvas>
                     </div>
                 </div>
             </div>
         </div>
+
     </main>
 
     <!-- Footer -->
@@ -498,15 +399,23 @@
         <div class="container">
             <div class="footer-grid">
                 <div class="footer-brand">
-                    <a href="#" class="logo" onclick="router('home')">
+                    <a href="javascript:void(0)" class="logo" onclick="router('home'); return false;">
                         <img src="logo.png" alt="Escapeo" class="logo-img" style="height:40px;width:auto;margin-right:8px;"> Escapeo
                     </a>
                     <p>Your gateway to extraordinary adventures. We craft unforgettable travel experiences around the globe.</p>
                     <div class="social-links">
-                        <a href="#">📘</a>
-                        <a href="#">📸</a>
-                        <a href="#">🐦</a>
-                        <a href="#">▶</a>
+                        <a href="javascript:void(0)" title="Facebook">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
+                        </a>
+                        <a href="javascript:void(0)" title="Instagram">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+                        </a>
+                        <a href="javascript:void(0)" title="X (Twitter)">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+                        </a>
+                        <a href="javascript:void(0)" title="YouTube">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M22.54 6.42a2.78 2.78 0 0 0-1.95-1.96C18.88 4 12 4 12 4s-6.88 0-8.59.46a2.78 2.78 0 0 0-1.95 1.96A29 29 0 0 0 1 12a29 29 0 0 0 .46 5.58A2.78 2.78 0 0 0 3.41 19.6C5.12 20 12 20 12 20s6.88 0 8.59-.46a2.78 2.78 0 0 0 1.95-1.95A29 29 0 0 0 23 12a29 29 0 0 0-.46-5.58z"/><polygon points="9.75 15.02 15.5 12 9.75 8.98 9.75 15.02" fill="white"/></svg>
+                        </a>
                     </div>
                 </div>
                 <div class="footer-links">
@@ -518,10 +427,10 @@
                 </div>
                 <div class="footer-links">
                     <h4>Destinations</h4>
-                    <a href="#">Tokyo</a>
-                    <a href="#">Paris</a>
-                    <a href="#">Maldives</a>
-                    <a href="#">London</a>
+                    <a href="javascript:void(0)">Tokyo</a>
+                    <a href="javascript:void(0)">Paris</a>
+                    <a href="javascript:void(0)">Maldives</a>
+                    <a href="javascript:void(0)">London</a>
                 </div>
                 <div class="footer-links">
                     <h4>Contact</h4>
@@ -536,48 +445,34 @@
         </div>
     </footer>
 
-    <!-- MODALS -->
-
     <!-- Login Modal -->
     <div class="modal" id="loginModal">
         <div class="modal-content">
             <button class="modal-close" onclick="closeModal('loginModal')">✕</button>
-            <div class="modal-header">
-                <h2>Welcome Back</h2>
-                <p>Sign in to access your bookings and wishlist</p>
-            </div>
-            <form onsubmit="login(event)">
-                <div class="form-group">
-                    <label>Email</label>
-                    <input type="email" id="loginEmail" required placeholder="you@example.com">
-                </div>
-                <div class="form-group">
-                    <label>Password</label>
-                    <input type="password" id="loginPassword" required placeholder="••••••••">
-                </div>
+            <div class="modal-header"><h2>Welcome Back</h2><p>Sign in to access your bookings and wishlist</p></div>
+            <form id="loginForm">
+                <div class="form-group"><label>Email</label><input type="email" id="loginEmail" required placeholder="you@example.com"></div>
+                <div class="form-group"><label>Password</label><input type="password" id="loginPassword" required placeholder="••••••••"></div>
                 <div class="form-options">
-                    <label class="checkbox">
-                        <input type="checkbox" id="rememberMe">
-                        <span>Remember me</span>
-                    </label>
-                    <a href="#" class="text-link">Forgot password?</a>
+                    <label class="checkbox"><input type="checkbox" id="rememberMe"><span>Remember me</span></label>
+                    <a href="javascript:void(0)" class="text-link">Forgot password?</a>
                 </div>
                 <button type="submit" class="btn btn-primary btn-lg btn-full">Sign In</button>
             </form>
             <div class="modal-divider"><span>or continue with</span></div>
             <div class="social-login">
                 <button class="btn btn-outline" onclick="window.location.href='/auth/google'">
-                            <svg width="18" height="18" viewBox="0 0 24 24" style="margin-right:8px;">
-                                <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z"/>
-                                <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-                                <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
-                                <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
-                            </svg>
-                            Sign in with Google
-                        </button>
+                    <svg width="18" height="18" viewBox="0 0 24 24" style="margin-right:8px;">
+                        <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z"/>
+                        <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                        <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+                        <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+                    </svg>
+                    Sign in with Google
+                </button>
                 <button class="btn btn-outline">📘 Facebook</button>
             </div>
-            <p class="modal-footer">Don't have an account? <a href="#" onclick="switchModal('loginModal','registerModal')">Sign up</a></p>
+            <p class="modal-footer">Don't have an account? <a href="javascript:void(0)" onclick="switchModal('loginModal','registerModal'); return false;">Sign up</a></p>
         </div>
     </div>
 
@@ -585,41 +480,19 @@
     <div class="modal" id="registerModal">
         <div class="modal-content">
             <button class="modal-close" onclick="closeModal('registerModal')">✕</button>
-            <div class="modal-header">
-                <h2>Create Account</h2>
-                <p>Join Escapeo and start your journey</p>
-            </div>
-            <form onsubmit="register(event)">
+            <div class="modal-header"><h2>Create Account</h2><p>Join Escapeo and start your journey</p></div>
+            <form id="registerForm">
                 <div class="form-row">
-                    <div class="form-group">
-                        <label>First Name</label>
-                        <input type="text" id="regFirstName" required>
-                    </div>
-                    <div class="form-group">
-                        <label>Last Name</label>
-                        <input type="text" id="regLastName" required>
-                    </div>
+                    <div class="form-group"><label>First Name</label><input type="text" id="regFirstName" required></div>
+                    <div class="form-group"><label>Last Name</label><input type="text" id="regLastName" required></div>
                 </div>
-                <div class="form-group">
-                    <label>Email</label>
-                    <input type="email" id="regEmail" required>
-                </div>
-                <div class="form-group">
-                    <label>Password</label>
-                    <input type="password" id="regPassword" required minlength="6">
-                    <div class="password-strength" id="regPasswordStrength"></div>
-                </div>
-                <div class="form-group">
-                    <label>Confirm Password</label>
-                    <input type="password" id="regConfirmPassword" required>
-                </div>
-                <label class="checkbox">
-                    <input type="checkbox" required>
-                    <span>I agree to the <a href="#">Terms</a> and <a href="#">Privacy Policy</a></span>
-                </label>
+                <div class="form-group"><label>Email</label><input type="email" id="regEmail" required></div>
+                <div class="form-group"><label>Password</label><input type="password" id="regPassword" required minlength="6"><div class="password-strength" id="regPasswordStrength"></div></div>
+                <div class="form-group"><label>Confirm Password</label><input type="password" id="regConfirmPassword" required></div>
+                <label class="checkbox"><input type="checkbox" required><span>I agree to the <a href="javascript:void(0)">Terms</a> and <a href="javascript:void(0)">Privacy Policy</a></span></label>
                 <button type="submit" class="btn btn-primary btn-lg btn-full">Create Account</button>
             </form>
-            <p class="modal-footer">Already have an account? <a href="#" onclick="switchModal('registerModal','loginModal')">Sign in</a></p>
+            <p class="modal-footer">Already have an account? <a href="javascript:void(0)" onclick="switchModal('registerModal','loginModal'); return false;">Sign in</a></p>
         </div>
     </div>
 
@@ -636,126 +509,49 @@
                     <div class="booking-step" data-step="5">Payment</div>
                 </div>
                 <div class="booking-content" id="bookingContent">
-                    <!-- Step 1: Dates & Travelers -->
                     <div class="booking-step-content active" data-step="1">
                         <h3>Select Your Dates</h3>
                         <div class="form-row">
-                            <div class="form-group">
-                                <label>Check-in Date</label>
-                                <input type="date" id="bookCheckIn" required>
-                            </div>
-                            <div class="form-group">
-                                <label>Check-out Date</label>
-                                <input type="date" id="bookCheckOut" required>
-                            </div>
+                            <div class="form-group"><label>Check-in Date</label><input type="date" id="bookCheckIn" required></div>
+                            <div class="form-group"><label>Check-out Date</label><input type="date" id="bookCheckOut" required></div>
                         </div>
                         <div class="form-row">
-                            <div class="form-group">
-                                <label>Adults</label>
-                                <input type="number" id="bookAdults" min="1" value="2">
-                            </div>
-                            <div class="form-group">
-                                <label>Children</label>
-                                <input type="number" id="bookChildren" min="0" value="0">
-                            </div>
+                            <div class="form-group"><label>Adults</label><input type="number" id="bookAdults" min="1" value="2"></div>
+                            <div class="form-group"><label>Children</label><input type="number" id="bookChildren" min="0" value="0"></div>
                         </div>
-                        <div class="form-group">
-                            <label>Room Type</label>
-                            <select id="bookRoomType">
-                                <option value="standard">Standard Room</option>
-                                <option value="deluxe">Deluxe Room (+$50/night)</option>
-                                <option value="suite">Suite (+$120/night)</option>
-                            </select>
-                        </div>
+                        <div class="form-group"><label>Room Type</label><select id="bookRoomType"><option value="standard">Standard Room</option><option value="deluxe">Deluxe Room (+$50/night)</option><option value="suite">Suite (+$120/night)</option></select></div>
                     </div>
-                    <!-- Step 2: Extras -->
                     <div class="booking-step-content" data-step="2">
                         <h3>Add Extras</h3>
                         <div class="extras-list">
-                            <label class="extra-item">
-                                <input type="checkbox" class="extra-check" data-price="25" data-name="Travel Insurance">
-                                <div class="extra-info">
-                                    <span class="extra-name">🛡 Travel Insurance</span>
-                                    <span class="extra-price">+$25/person</span>
-                                </div>
-                            </label>
-                            <label class="extra-item">
-                                <input type="checkbox" class="extra-check" data-price="45" data-name="Airport Transfer">
-                                <div class="extra-info">
-                                    <span class="extra-name">🚗 Airport Transfer</span>
-                                    <span class="extra-price">+$45/trip</span>
-                                </div>
-                            </label>
-                            <label class="extra-item">
-                                <input type="checkbox" class="extra-check" data-price="80" data-name="Guided City Tour">
-                                <div class="extra-info">
-                                    <span class="extra-name">🗺 Guided City Tour</span>
-                                    <span class="extra-price">+$80/person</span>
-                                </div>
-                            </label>
-                            <label class="extra-item">
-                                <input type="checkbox" class="extra-check" data-price="35" data-name="Breakfast Package">
-                                <div class="extra-info">
-                                    <span class="extra-name">🍳 Breakfast Package</span>
-                                    <span class="extra-price">+$35/person/day</span>
-                                </div>
-                            </label>
+                            <label class="extra-item"><input type="checkbox" class="extra-check" data-price="25" data-name="Travel Insurance"><div class="extra-info"><span class="extra-name">🛡 Travel Insurance</span><span class="extra-price">+$25/person</span></div></label>
+                            <label class="extra-item"><input type="checkbox" class="extra-check" data-price="45" data-name="Airport Transfer"><div class="extra-info"><span class="extra-name">🚗 Airport Transfer</span><span class="extra-price">+$45/trip</span></div></label>
+                            <label class="extra-item"><input type="checkbox" class="extra-check" data-price="80" data-name="Guided City Tour"><div class="extra-info"><span class="extra-name">🗺 Guided City Tour</span><span class="extra-price">+$80/person</span></div></label>
+                            <label class="extra-item"><input type="checkbox" class="extra-check" data-price="35" data-name="Breakfast Package"><div class="extra-info"><span class="extra-name">🍳 Breakfast Package</span><span class="extra-price">+$35/person/day</span></div></label>
                         </div>
                     </div>
-                    <!-- Step 3: Details -->
                     <div class="booking-step-content" data-step="3">
                         <h3>Traveler Details</h3>
-                        <div id="bookingUserDetails">
-                            <div class="form-group">
-                                <label>Full Name</label>
-                                <input type="text" id="bookName" required>
-                            </div>
-                            <div class="form-group">
-                                <label>Email</label>
-                                <input type="email" id="bookEmail" required>
-                            </div>
-                            <div class="form-group">
-                                <label>Phone</label>
-                                <input type="tel" id="bookPhone" required>
-                            </div>
-                            <div class="form-group">
-                                <label>Special Requests</label>
-                                <textarea id="bookRequests" rows="3" placeholder="Any dietary requirements, accessibility needs, etc."></textarea>
-                            </div>
-                        </div>
+                        <div class="form-group"><label>Full Name</label><input type="text" id="bookName" required></div>
+                        <div class="form-group"><label>Email</label><input type="email" id="bookEmail" required></div>
+                        <div class="form-group"><label>Phone</label><input type="tel" id="bookPhone" required></div>
+                        <div class="form-group"><label>Special Requests</label><textarea id="bookRequests" rows="3" placeholder="Any dietary requirements, accessibility needs, etc."></textarea></div>
                     </div>
-                    <!-- Step 4: Review -->
                     <div class="booking-step-content" data-step="4">
                         <h3>Review Your Booking</h3>
                         <div class="booking-summary" id="bookingSummary"></div>
                     </div>
-                    <!-- Step 5: Payment -->
                     <div class="booking-step-content" data-step="5">
                         <h3>Payment</h3>
                         <div class="payment-methods">
-                            <label class="payment-method active">
-                                <input type="radio" name="payment" value="card" checked>
-                                <span>💳 Credit Card</span>
-                            </label>
-                            <label class="payment-method">
-                                <input type="radio" name="payment" value="arrival">
-                                <span>💵 Pay on Arrival</span>
-                            </label>
+                            <label class="payment-method active"><input type="radio" name="payment" value="card" checked><span>💳 Credit Card</span></label>
+                            <label class="payment-method"><input type="radio" name="payment" value="arrival"><span>💵 Pay on Arrival</span></label>
                         </div>
                         <div id="cardPaymentForm">
-                            <div class="form-group">
-                                <label>Card Number</label>
-                                <input type="text" placeholder="4242 4242 4242 4242" maxlength="19" id="cardNumber">
-                            </div>
+                            <div class="form-group"><label>Card Number</label><input type="text" placeholder="4242 4242 4242 4242" maxlength="19" id="cardNumber"></div>
                             <div class="form-row">
-                                <div class="form-group">
-                                    <label>Expiry</label>
-                                    <input type="text" placeholder="MM/YY" maxlength="5" id="cardExpiry">
-                                </div>
-                                <div class="form-group">
-                                    <label>CVC</label>
-                                    <input type="text" placeholder="123" maxlength="4" id="cardCvc">
-                                </div>
+                                <div class="form-group"><label>Expiry</label><input type="text" placeholder="MM/YY" maxlength="5" id="cardExpiry"></div>
+                                <div class="form-group"><label>CVC</label><input type="text" placeholder="123" maxlength="4" id="cardCvc"></div>
                             </div>
                         </div>
                         <div class="booking-total" id="bookingTotal"></div>
@@ -783,41 +579,15 @@
             <button class="modal-close" onclick="closeModal('addDestinationModal')">✕</button>
             <h2>Add New Destination</h2>
             <form onsubmit="addDestination(event)">
-                <div class="form-group">
-                    <label>Name</label>
-                    <input type="text" id="newDestName" required>
-                </div>
-                <div class="form-group">
-                    <label>Location</label>
-                    <input type="text" id="newDestLocation" required>
-                </div>
-                <div class="form-group">
-                    <label>Country</label>
-                    <input type="text" id="newDestCountry" required>
-                </div>
-                <div class="form-group">
-                    <label>Description</label>
-                    <textarea id="newDestDesc" rows="3" required></textarea>
-                </div>
+                <div class="form-group"><label>Name</label><input type="text" id="newDestName" required></div>
+                <div class="form-group"><label>Location</label><input type="text" id="newDestLocation" required></div>
+                <div class="form-group"><label>Country</label><input type="text" id="newDestCountry" required></div>
+                <div class="form-group"><label>Description</label><textarea id="newDestDesc" rows="3" required></textarea></div>
                 <div class="form-row">
-                    <div class="form-group">
-                        <label>Price per Night</label>
-                        <input type="number" id="newDestPrice" required>
-                    </div>
-                    <div class="form-group">
-                        <label>Category</label>
-                        <select id="newDestCategory">
-                            <option value="beach">Beach</option>
-                            <option value="mountain">Mountain</option>
-                            <option value="city">City</option>
-                            <option value="cultural">Cultural</option>
-                        </select>
-                    </div>
+                    <div class="form-group"><label>Price per Night</label><input type="number" id="newDestPrice" required></div>
+                    <div class="form-group"><label>Category</label><select id="newDestCategory"><option value="beach">Beach</option><option value="mountain">Mountain</option><option value="city">City</option><option value="cultural">Cultural</option></select></div>
                 </div>
-                <div class="form-group">
-                    <label>Image URL</label>
-                    <input type="url" id="newDestImage" placeholder="https://images.unsplash.com/...">
-                </div>
+                <div class="form-group"><label>Image URL</label><input type="url" id="newDestImage" placeholder="https://images.unsplash.com/..."></div>
                 <button type="submit" class="btn btn-primary btn-full">Add Destination</button>
             </form>
         </div>
@@ -827,7 +597,6 @@
     <div class="overlay" id="overlay"></div>
 
     <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="script.js"></script>
 </body>
 </html>

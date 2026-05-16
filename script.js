@@ -1,72 +1,6 @@
 let currentCurrency = localStorage.getItem('escapeo-currency') || 'USD';
-const EXCHANGE_RATE = 50.5; // 1 USD = 50.5 EGP
+const EXCHANGE_RATE = 50.5;
 
-function formatPrice(amount) {
-  if (currentCurrency === 'EGP') {
-    return 'ج.م ' + Math.round(amount * EXCHANGE_RATE).toLocaleString();
-  }
-  return '$' + amount.toLocaleString();
-}
-
-function formatPriceShort(amount) {
-  if (currentCurrency === 'EGP') {
-    return 'ج.م ' + Math.round(amount * EXCHANGE_RATE);
-  }
-  return '$' + amount;
-}
-
-function changeCurrency(currency) {
-  currentCurrency = currency;
-  localStorage.setItem('escapeo-currency', currency);
-  document.getElementById('currencyBtn').textContent = (currency === 'EGP' ? 'ج.م' : '$') + ' ▼';
-  showToast('Currency set to ' + (currency === 'EGP' ? 'Egyptian Pound (EGP)' : 'US Dollar (USD)'));
-  renderDestinations();
-  renderPackages();
-  if (!document.getElementById('page-wishlist').classList.contains('hidden')) {
-    loadWishlist();
-  }
-  if (!document.getElementById('page-bookings').classList.contains('hidden')) {
-    loadBookings();
-  }
-  if (!document.getElementById('page-admin').classList.contains('hidden')) {
-    loadAdminOverview();
-  }
-}
-
-function initCurrencySwitcher() {
-  var currencyBtn = document.getElementById('currencyBtn');
-  var currencyDropdown = document.getElementById('currencyDropdown');
-  if (currencyBtn && currencyDropdown) {
-    currencyBtn.textContent = (currentCurrency === 'EGP' ? 'ج.م' : '$') + ' ▼';
-    currencyBtn.addEventListener('click', function(e) {
-      e.stopPropagation();
-      currencyDropdown.classList.toggle('active');
-    });
-    document.addEventListener('click', function() { currencyDropdown.classList.remove('active'); });
-    currencyDropdown.querySelectorAll('a').forEach(function(a) {
-      a.addEventListener('click', function(e) {
-        e.preventDefault();
-        changeCurrency(a.dataset.currency);
-      });
-    });
-  }
-}
-
-function updateGreeting() {
-  const hour = new Date().getHours();
-  let greeting = "Good morning, traveler!";
-  if (hour >= 12 && hour < 17) {
-    greeting = "Good afternoon, traveler!";
-  } else if (hour >= 17) {
-    greeting = "Good evening, traveler!";
-  }
-  const el = document.getElementById('heroGreeting');
-  if (el) el.textContent = greeting;
-}
-
-// ============================================
-// MOCK DATA
-// ============================================
 const destinations = [
   { id: 1, name: "Tokyo", location: "Japan", country: "Japan", category: "city", image: "https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?w=800&q=80", price: 145, rating: 4.8, reviews: 312 },
   { id: 2, name: "Istanbul", location: "Turkey", country: "Turkey", category: "cultural", image: "https://images.unsplash.com/photo-1524231757912-21f4fe3a7200?w=800&q=80", price: 95, rating: 4.7, reviews: 198 },
@@ -100,12 +34,80 @@ const testimonials = [
   { id: 6, name: "Yousef", location: "Doha, Qatar", avatar: "https://ui-avatars.com/api/?name=Yousef&background=00bcd4&color=fff", rating: 5, text: "Tokyo was amazing! The bullet train, sushi masterclass, and temple visits created memories we'll cherish forever." }
 ];
 
-// ============================================
-// AUTH STATE
-// ============================================
 let currentUser = JSON.parse(localStorage.getItem('escapeo-user')) || null;
 let bookings = JSON.parse(localStorage.getItem('escapeo-bookings')) || [];
 let wishlist = JSON.parse(localStorage.getItem('escapeo-wishlist')) || [];
+let currentBooking = { step: 1, destination: null, package: null, dates: {}, travelers: {}, extras: [], total: 0 };
+
+function formatPrice(amount) {
+  if (currentCurrency === 'EGP') {
+    return 'EGP ' + Math.round(amount * EXCHANGE_RATE).toLocaleString();
+  }
+  return '$' + amount.toLocaleString();
+}
+
+function formatPriceShort(amount) {
+  if (currentCurrency === 'EGP') {
+    var egp = Math.round(amount * EXCHANGE_RATE);
+    return egp >= 1000 ? 'EGP ' + (egp / 1000).toFixed(1) + 'k' : 'EGP ' + egp;
+  }
+  return amount >= 1000 ? '$' + (amount / 1000).toFixed(1) + 'k' : '$' + amount;
+}
+
+function initCurrencySwitcher() {
+  var btn = document.getElementById('currencyBtn');
+  var dropdown = document.getElementById('currencyDropdown');
+  if (!btn || !dropdown) return;
+
+  // Set initial button label
+  btn.textContent = currentCurrency === 'EGP' ? 'ج.م ▼' : '$ ▼';
+
+  // Toggle dropdown on button click
+  btn.addEventListener('click', function(e) {
+    e.stopPropagation();
+    dropdown.classList.toggle('active');
+  });
+
+  // Close dropdown when clicking outside
+  document.addEventListener('click', function() {
+    dropdown.classList.remove('active');
+  });
+
+  // Handle currency selection
+  dropdown.querySelectorAll('[data-currency]').forEach(function(link) {
+    link.addEventListener('click', function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      currentCurrency = this.dataset.currency;
+      localStorage.setItem('escapeo-currency', currentCurrency);
+      btn.textContent = currentCurrency === 'EGP' ? 'ج.م ▼' : '$ ▼';
+      dropdown.classList.remove('active');
+
+      // Re-render price-sensitive UI
+      var activeTab = document.querySelector('.filter-tab.active');
+      renderDestinations(activeTab ? activeTab.dataset.filter : 'all');
+      renderPackages();
+
+      // Sync preferences dropdown if visible
+      var prefCurrency = document.getElementById('prefCurrency');
+      if (prefCurrency) prefCurrency.value = currentCurrency;
+    });
+  });
+
+  // Sync prefCurrency dropdown in profile
+  var prefCurrency = document.getElementById('prefCurrency');
+  if (prefCurrency) {
+    prefCurrency.value = currentCurrency;
+    prefCurrency.addEventListener('change', function() {
+      currentCurrency = this.value;
+      localStorage.setItem('escapeo-currency', currentCurrency);
+      btn.textContent = currentCurrency === 'EGP' ? 'ج.م ▼' : '$ ▼';
+      var activeTab = document.querySelector('.filter-tab.active');
+      renderDestinations(activeTab ? activeTab.dataset.filter : 'all');
+      renderPackages();
+    });
+  }
+}
 
 if (!localStorage.getItem('escapeo-destinations')) {
   localStorage.setItem('escapeo-destinations', JSON.stringify(destinations));
@@ -114,9 +116,18 @@ if (!localStorage.getItem('escapeo-packages')) {
   localStorage.setItem('escapeo-packages', JSON.stringify(packages));
 }
 
-// ============================================
-// UI HELPERS
-// ============================================
+function updateGreeting() {
+  const hour = new Date().getHours();
+  let greeting = "Good morning, traveler!";
+  if (hour >= 12 && hour < 17) {
+    greeting = "Good afternoon, traveler!";
+  } else if (hour >= 17) {
+    greeting = "Good evening, traveler!";
+  }
+  const el = document.getElementById('heroGreeting');
+  if (el) el.textContent = greeting;
+}
+
 function showToast(message, type) {
   type = type || 'success';
   const container = document.getElementById('toastContainer');
@@ -148,9 +159,6 @@ function switchModal(closeId, openId) {
   setTimeout(function() { openModal(openId); }, 300);
 }
 
-// ============================================
-// NAVBAR
-// ============================================
 function initNavbar() {
   var navbar = document.getElementById('navbar');
   window.addEventListener('scroll', function() {
@@ -174,8 +182,12 @@ function initNavbar() {
   var hamburger = document.getElementById('hamburger');
   var mobileMenu = document.getElementById('mobileMenu');
   var mobileClose = document.getElementById('mobileClose');
-  hamburger.addEventListener('click', function() { mobileMenu.classList.add('active'); });
-  mobileClose.addEventListener('click', function() { mobileMenu.classList.remove('active'); });
+  if (hamburger) {
+    hamburger.addEventListener('click', function() { mobileMenu.classList.add('active'); });
+  }
+  if (mobileClose) {
+    mobileClose.addEventListener('click', function() { mobileMenu.classList.remove('active'); });
+  }
 }
 
 function updateAuthUI() {
@@ -191,34 +203,54 @@ function updateAuthUI() {
   }
 }
 
-// ============================================
-// AUTH FUNCTIONS
-// ============================================
 function login(e) {
   e.preventDefault();
   var email = document.getElementById('loginEmail').value;
   var password = document.getElementById('loginPassword').value;
 
-  if (email === 'admin@escapeo.com' && password === 'admin123') {
-    currentUser = { id: 'admin', email: 'admin@escapeo.com', firstName: 'Admin', lastName: 'User', role: 'admin' };
-    localStorage.setItem('escapeo-user', JSON.stringify(currentUser));
-    closeModal('loginModal');
-    updateAuthUI();
-    showToast('Welcome back, Admin!');
-    router('admin');
-    return;
-  }
-
-  if (email === 'demo@escapeo.com' && password === 'demo123') {
-    currentUser = { id: 'demo', email: 'demo@escapeo.com', firstName: 'Demo', lastName: 'User', role: 'customer' };
-    localStorage.setItem('escapeo-user', JSON.stringify(currentUser));
-    closeModal('loginModal');
-    updateAuthUI();
-    showToast('Welcome back, Demo User!');
-    return;
-  }
-
-  showToast('Invalid credentials. Try demo@escapeo.com / demo123', 'error');
+  fetch('/api/auth/login', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email: email, password: password })
+  })
+  .then(function(res) { return res.json(); })
+  .then(function(data) {
+    if (data.error) {
+      showToast(data.error || 'Invalid credentials', 'error');
+      return;
+    }
+    if (data.token && data.user) {
+      currentUser = data.user;
+      localStorage.setItem('escapeo-user', JSON.stringify(currentUser));
+      localStorage.setItem('escapeo-token', data.token);
+      closeModal('loginModal');
+      updateAuthUI();
+      showToast('Welcome back, ' + currentUser.firstName + '!');
+      if (currentUser.role === 'admin') router('admin');
+      return;
+    }
+    showToast('Login failed. Please try again.', 'error');
+  })
+  .catch(function() {
+    if (email === 'admin@escapeo.com' && password === 'admin123') {
+      currentUser = { id: 'admin', email: 'admin@escapeo.com', firstName: 'Admin', lastName: 'User', role: 'admin' };
+      localStorage.setItem('escapeo-user', JSON.stringify(currentUser));
+      closeModal('loginModal');
+      updateAuthUI();
+      showToast('Welcome back, Admin!');
+      router('admin');
+      return;
+    }
+    if (email === 'demo@escapeo.com' && password === 'demo123') {
+      currentUser = { id: 'demo', email: 'demo@escapeo.com', firstName: 'Demo', lastName: 'User', role: 'customer' };
+      localStorage.setItem('escapeo-user', JSON.stringify(currentUser));
+      closeModal('loginModal');
+      updateAuthUI();
+      showToast('Welcome back, Demo User!');
+      return;
+    }
+    showToast('Invalid credentials. Try demo@escapeo.com / demo123', 'error');
+  });
 }
 
 function register(e) {
@@ -234,29 +266,55 @@ function register(e) {
     return;
   }
 
-  currentUser = { id: Date.now().toString(), email: email, firstName: firstName, lastName: lastName, role: 'customer' };
-  localStorage.setItem('escapeo-user', JSON.stringify(currentUser));
-  closeModal('registerModal');
-  updateAuthUI();
-  showToast('Account created successfully!');
+  fetch('/api/auth/register', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email: email, password: password, firstName: firstName, lastName: lastName })
+  })
+  .then(function(res) { return res.json(); })
+  .then(function(data) {
+    if (data.error) { showToast(data.error, 'error'); return; }
+    if (data.token && data.user) {
+      currentUser = data.user;
+      localStorage.setItem('escapeo-user', JSON.stringify(currentUser));
+      localStorage.setItem('escapeo-token', data.token);
+      closeModal('registerModal');
+      updateAuthUI();
+      showToast('Account created successfully!');
+      return;
+    }
+    showToast('Registration failed. Please try again.', 'error');
+  })
+  .catch(function() {
+    currentUser = { id: Date.now().toString(), email: email, firstName: firstName, lastName: lastName, role: 'customer' };
+    localStorage.setItem('escapeo-user', JSON.stringify(currentUser));
+    closeModal('registerModal');
+    updateAuthUI();
+    showToast('Account created successfully!');
+  });
 }
 
 function logout() {
   currentUser = null;
   localStorage.removeItem('escapeo-user');
+  localStorage.removeItem('escapeo-token');
   updateAuthUI();
   showToast('Logged out successfully');
   router('home');
 }
 
-// ============================================
-// GOOGLE OAUTH HANDLER
-// ============================================
 function handleGoogleCallback() {
   const urlParams = new URLSearchParams(window.location.search);
   const token = urlParams.get('token');
   const userStr = urlParams.get('user');
-  
+  const error = urlParams.get('error');
+
+  if (error) {
+    showToast('Google sign in failed: ' + error, 'error');
+    window.history.replaceState({}, document.title, window.location.pathname);
+    return;
+  }
+
   if (token && userStr) {
     try {
       const user = JSON.parse(decodeURIComponent(userStr));
@@ -265,58 +323,72 @@ function handleGoogleCallback() {
       localStorage.setItem('escapeo-token', token);
       updateAuthUI();
       showToast('Welcome, ' + user.firstName + '!');
-      
-      // Clean URL
       window.history.replaceState({}, document.title, window.location.pathname);
+      if (user.role === 'admin') {
+        router('admin');
+      }
     } catch (e) {
       console.error('Error parsing Google user data:', e);
+      showToast('Failed to process Google sign in', 'error');
     }
   }
 }
 
-// ============================================
-// ROUTING
-// ============================================
+function hideLoader() {
+  var loader = document.getElementById('loader');
+  if (!loader) return;
+  loader.style.opacity = '0';
+  loader.style.transition = 'opacity 0.4s ease';
+  setTimeout(function() { loader.style.display = 'none'; }, 400);
+}
+
+function showEl(id) {
+  var el = document.getElementById(id);
+  if (el) el.classList.remove('hidden');
+}
+
+function hideEl(id) {
+  var el = document.getElementById(id);
+  if (el) el.classList.add('hidden');
+}
+
 function router(page) {
   document.querySelectorAll('.page').forEach(function(p) { p.classList.add('hidden'); });
-  document.getElementById('page-home').classList.add('hidden');
 
   if (page === 'home') {
-    document.getElementById('page-home').classList.remove('hidden');
-    document.getElementById('mainFooter').classList.remove('hidden');
+    showEl('page-home');
+    showEl('mainFooter');
     window.scrollTo(0, 0);
   } else if (page === 'profile') {
     if (!currentUser) { openModal('loginModal'); return; }
-    document.getElementById('page-profile').classList.remove('hidden');
+    showEl('page-profile');
     loadProfile();
   } else if (page === 'bookings') {
     if (!currentUser) { openModal('loginModal'); return; }
-    document.getElementById('page-bookings').classList.remove('hidden');
+    showEl('page-bookings');
     loadBookings();
   } else if (page === 'wishlist') {
     if (!currentUser) { openModal('loginModal'); return; }
-    document.getElementById('page-wishlist').classList.remove('hidden');
+    showEl('page-wishlist');
     loadWishlist();
   } else if (page === 'admin') {
     if (!currentUser || currentUser.role !== 'admin') {
       showToast('Access denied', 'error');
       return;
     }
-    document.getElementById('page-admin').classList.remove('hidden');
-    document.getElementById('mainFooter').classList.add('hidden');
+    showEl('page-admin');
+    hideEl('mainFooter');
     loadAdminDashboard();
   }
 
-  document.getElementById('mobileMenu').classList.remove('active');
+  hideEl('mobileMenu');
 }
 
-// ============================================
-// HOME PAGE RENDERERS
-// ============================================
 function renderDestinations(filter) {
   filter = filter || 'all';
   var grid = document.getElementById('destinationsGrid');
-  var filtered = filter === 'all' ? destinations : destinations.filter(function(d) { return d.category === filter; });
+  var allDests = JSON.parse(localStorage.getItem('escapeo-destinations')) || destinations;
+  var filtered = filter === 'all' ? allDests : allDests.filter(function(d) { return d.category === filter; });
 
   grid.innerHTML = filtered.map(function(dest) {
     var isWishlisted = wishlist.indexOf(dest.id) > -1;
@@ -391,9 +463,6 @@ function renderTestimonials() {
   }).join('');
 }
 
-// ============================================
-// WISHLIST
-// ============================================
 function toggleWishlist(destId) {
   if (!currentUser) { openModal('loginModal'); return; }
   var idx = wishlist.indexOf(destId);
@@ -437,14 +506,10 @@ function loadWishlist() {
   }).join('');
 }
 
-// ============================================
-// BOOKING FLOW
-// ============================================
-var currentBooking = { step: 1, destination: null, package: null, dates: {}, travelers: {}, extras: [], total: 0 };
-
 function startBooking(destId) {
   if (!currentUser) { openModal('loginModal'); return; }
-  currentBooking = { step: 1, destination: destinations.find(function(d) { return d.id === destId; }), package: null, dates: {}, travelers: {}, extras: [], total: 0 };
+  var allDests = JSON.parse(localStorage.getItem('escapeo-destinations')) || destinations;
+  currentBooking = { step: 1, destination: allDests.find(function(d) { return d.id === destId; }), package: null, dates: {}, travelers: {}, extras: [], total: 0 };
   openModal('bookingModal');
   updateBookingStep();
 }
@@ -535,28 +600,93 @@ function updateBookingTotal() {
 }
 
 function confirmBooking() {
+  var token = localStorage.getItem('escapeo-token');
+  var refNumber = 'ESC-' + Date.now().toString(36).toUpperCase();
+
+  var checkIn = document.getElementById('bookCheckIn') ? document.getElementById('bookCheckIn').value : '';
+  var checkOut = document.getElementById('bookCheckOut') ? document.getElementById('bookCheckOut').value : '';
+  var adults = document.getElementById('bookAdults') ? parseInt(document.getElementById('bookAdults').value) || 2 : 2;
+  var children = document.getElementById('bookChildren') ? parseInt(document.getElementById('bookChildren').value) || 0 : 0;
+  var roomType = document.getElementById('bookRoomType') ? document.getElementById('bookRoomType').value : 'standard';
+  var specialRequests = document.getElementById('bookRequests') ? document.getElementById('bookRequests').value : '';
+  var paymentMethodEl = document.querySelector('input[name="payment"]:checked');
+  var paymentMethod = paymentMethodEl ? paymentMethodEl.value : 'card';
+
+  var extraChecks = document.querySelectorAll('.extra-check:checked');
+  var extras = Array.from(extraChecks).map(function(cb) {
+    return { name: cb.dataset.name, price: parseInt(cb.dataset.price) };
+  });
+
+  if (token) {
+    var payload = {
+      destination_id: currentBooking.destination ? currentBooking.destination.id : null,
+      package_id: currentBooking.package ? currentBooking.package.id : null,
+      check_in: checkIn,
+      check_out: checkOut,
+      adults: adults,
+      children: children,
+      room_type: roomType,
+      extras: extras,
+      total_price: currentBooking.total,
+      payment_method: paymentMethod,
+      special_requests: specialRequests
+    };
+
+    fetch('/api/bookings', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + token
+      },
+      body: JSON.stringify(payload)
+    })
+    .then(function(res) {
+      if (!res.ok) {
+        return res.json().then(function(err) {
+          throw new Error(err.error || 'Failed to save booking');
+        });
+      }
+      return res.json();
+    })
+    .then(function(data) {
+      closeModal('bookingModal');
+      showToast('Booking submitted! Reference: ' + (data.ref_number || refNumber) + ' — Awaiting admin confirmation.');
+      currentBooking = { step: 1, destination: null, package: null, dates: {}, travelers: {}, extras: [], total: 0 };
+      if (document.getElementById('page-bookings') && !document.getElementById('page-bookings').classList.contains('hidden')) {
+        loadBookings();
+      }
+    })
+    .catch(function(err) {
+      console.error('Booking API error:', err);
+      // Fallback to localStorage on API error
+      saveBookingLocally(refNumber, checkIn, checkOut, adults, children, roomType, extras, specialRequests);
+    });
+
+  } else {
+    saveBookingLocally(refNumber, checkIn, checkOut, adults, children, roomType, extras, specialRequests);
+  }
+}
+
+function saveBookingLocally(refNumber, checkIn, checkOut, adults, children, roomType, extras, specialRequests) {
   var booking = {
-    id: 'ESC-' + Date.now().toString(36).toUpperCase(),
+    id: refNumber,
     userId: currentUser.id,
     destination: currentBooking.destination,
     package: currentBooking.package,
-    dates: currentBooking.dates,
-    travelers: currentBooking.travelers,
-    extras: currentBooking.extras,
+    dates: { checkIn: checkIn, checkOut: checkOut },
+    travelers: { adults: adults, children: children },
+    extras: extras,
     total: currentBooking.total,
-    status: 'confirmed',
+    status: 'pending',
     createdAt: new Date().toISOString()
   };
   bookings.push(booking);
   localStorage.setItem('escapeo-bookings', JSON.stringify(bookings));
   closeModal('bookingModal');
-  showToast('Booking confirmed! Reference: ' + booking.id);
+  showToast('Booking submitted! Reference: ' + booking.id + ' — Awaiting admin confirmation.');
   currentBooking = { step: 1, destination: null, package: null, dates: {}, travelers: {}, extras: [], total: 0 };
 }
 
-// ============================================
-// PROFILE PAGE
-// ============================================
 function loadProfile() {
   if (!currentUser) return;
   document.getElementById('profileName').textContent = currentUser.firstName + ' ' + currentUser.lastName;
@@ -569,353 +699,699 @@ function loadProfile() {
   document.getElementById('editEmail').value = currentUser.email;
 }
 
-function showProfileTab(tab) {
-  document.querySelectorAll('.profile-tab').forEach(function(t) { t.classList.add('hidden'); });
-  document.getElementById('tab-' + tab).classList.remove('hidden');
-  document.querySelectorAll('.profile-nav a').forEach(function(a) { a.classList.remove('active'); });
-  event.target.classList.add('active');
-}
-
-function updateProfile(e) {
-  e.preventDefault();
-  currentUser.firstName = document.getElementById('editFirstName').value;
-  currentUser.lastName = document.getElementById('editLastName').value;
-  localStorage.setItem('escapeo-user', JSON.stringify(currentUser));
-  loadProfile();
-  showToast('Profile updated successfully!');
-}
-
-function changePassword(e) {
-  e.preventDefault();
-  showToast('Password updated successfully!');
-}
-
-function setCurrency(curr) {
-  changeCurrency(curr);
-}
-
-// ============================================
-// BOOKINGS PAGE
-// ============================================
 function loadBookings() {
   var list = document.getElementById('bookingsList');
-  var userBookings = bookings.filter(function(b) { return b.userId === (currentUser ? currentUser.id : ''); });
+  if (!list) return;
 
+  list.innerHTML = '<div class="text-center" style="padding: 2rem;"><p>Loading your bookings...</p></div>';
+
+  var token = localStorage.getItem('escapeo-token');
+
+  if (token) {
+    fetch('/api/bookings', {
+      headers: {
+        'Authorization': 'Bearer ' + token
+      }
+    })
+    .then(function(res) {
+      if (!res.ok) throw new Error('Failed to load bookings');
+      return res.json();
+    })
+    .then(function(data) {
+      if (data.length === 0) {
+        list.innerHTML = '<div class="text-center" style="padding: 3rem;"><h3>No bookings yet</h3><p>Start exploring and book your first adventure!</p><button class="btn btn-primary" onclick="router(\'home\')">Explore Destinations</button></div>';
+        return;
+      }
+
+      list.innerHTML = data.map(function(b) {
+        var destName = b.destination_name || b.package_title || 'N/A';
+        var destImage = b.destination_image || b.package_image || '';
+        var destLocation = b.destination_location || b.package_destination || '';
+        var statusClass = 'status-' + (b.status || 'pending');
+
+        return '<div class="booking-item">' +
+          '<div class="booking-image">' +
+            '<img src="' + destImage + '" alt="' + destName + '">' +
+          '</div>' +
+          '<div class="booking-details">' +
+            '<h3>' + destName + '</h3>' +
+            '<p>📍 ' + destLocation + '</p>' +
+            '<p>📅 ' + (b.check_in || 'N/A') + ' to ' + (b.check_out || 'N/A') + '</p>' +
+            '<p>👥 ' + (b.adults || 0) + ' Adults, ' + (b.children || 0) + ' Children</p>' +
+            '<p>🏷 Ref: ' + (b.ref_number || b.id) + '</p>' +
+          '</div>' +
+          '<div class="booking-price">' + formatPrice(b.total_price || 0) + '</div>' +
+          '<div class="booking-status ' + statusClass + '">' + (b.status || 'pending') + '</div>' +
+        '</div>';
+      }).join('');
+    })
+    .catch(function(err) {
+      console.error('Error loading bookings:', err);
+      loadBookingsFromLocalStorage(list);
+    });
+  } else {
+    loadBookingsFromLocalStorage(list);
+  }
+}
+
+function loadBookingsFromLocalStorage(list) {
+  var userBookings = bookings.filter(function(b) { return b.userId === (currentUser ? currentUser.id : null); });
   if (userBookings.length === 0) {
-    list.innerHTML = '<div class="text-center" style="padding: 4rem;"><h3>No bookings yet</h3><p>Start exploring and book your first adventure!</p></div>';
+    list.innerHTML = '<div class="text-center" style="padding: 3rem;"><h3>No bookings yet</h3><p>Start exploring and book your first adventure!</p><button class="btn btn-primary" onclick="router(\'home\')">Explore Destinations</button></div>';
     return;
   }
-
   list.innerHTML = userBookings.map(function(b) {
+    var destName = b.destination ? b.destination.name : b.package ? b.package.title : 'N/A';
+    var destImage = b.destination ? b.destination.image : b.package ? b.package.image : '';
+    var statusClass = 'status-' + (b.status || 'pending');
     return '<div class="booking-item">' +
-      '<div class="booking-image">' +
-        '<img src="' + (b.destination ? b.destination.image : b.package.image) + '" alt="' + (b.destination ? b.destination.name : b.package.title) + '">' +
-      '</div>' +
+      '<div class="booking-image"><img src="' + destImage + '" alt="' + destName + '"></div>' +
       '<div class="booking-details">' +
-        '<h3>' + (b.destination ? b.destination.name : b.package.title) + '</h3>' +
-        '<p>📍 ' + (b.destination ? b.destination.location : b.package.destination) + '</p>' +
+        '<h3>' + destName + '</h3>' +
         '<p>📅 ' + (b.dates.checkIn || 'N/A') + ' to ' + (b.dates.checkOut || 'N/A') + '</p>' +
-        '<p>👥 ' + b.travelers.adults + ' Adults, ' + b.travelers.children + ' Children</p>' +
+        '<p>👥 ' + (b.travelers.adults || 0) + ' Adults, ' + (b.travelers.children || 0) + ' Children</p>' +
+        '<p>🏷 Ref: ' + b.id + '</p>' +
       '</div>' +
-      '<div class="booking-price">' + formatPrice(b.total) + '</div>' +
-      '<div class="booking-status status-' + b.status + '">' + b.status + '</div>' +
+      '<div class="booking-price">' + formatPrice(b.total || 0) + '</div>' +
+      '<div class="booking-status ' + statusClass + '">' + (b.status || 'pending') + '</div>' +
     '</div>';
   }).join('');
 }
 
-// ============================================
-// ADMIN DASHBOARD - FIXED
-// ============================================
-var adminCurrentTab = 'overview';
-var adminCharts = {};
-
-function showAdminTab(tab) {
-  adminCurrentTab = tab;
-  document.querySelectorAll('.admin-tab').forEach(function(t) { t.classList.add('hidden'); });
-  document.getElementById('admin-' + tab).classList.remove('hidden');
-  document.querySelectorAll('.admin-sidebar a').forEach(function(a) { a.classList.remove('active'); });
-  event.target.classList.add('active');
-
-  if (tab === 'overview') loadAdminOverview();
-  if (tab === 'destinations') loadAdminDestinations();
-  if (tab === 'analytics') loadAdminAnalytics();
-}
-
-function loadAdminDashboard() {
-  destroyAdminCharts();
-  showAdminTab('overview');
-}
-
-function destroyAdminCharts() {
-  Object.keys(adminCharts).forEach(function(key) {
-    if (adminCharts[key]) {
-      adminCharts[key].destroy();
-      adminCharts[key] = null;
-    }
-  });
-}
-
-function loadAdminOverview() {
-  document.getElementById('statTotalBookings').textContent = bookings.length;
-  document.getElementById('statRevenue').textContent = formatPrice(bookings.reduce(function(sum, b) { return sum + b.total; }, 0));
-
-  destroyAdminCharts();
-
-  var ctx1 = document.getElementById('bookingsChart');
-  var ctx2 = document.getElementById('revenueChart');
-
-  if (ctx1 && typeof Chart !== 'undefined') {
-    adminCharts.bookingsChart = new Chart(ctx1, {
-      type: 'line',
-      data: {
-        labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
-        datasets: [{
-          label: 'Bookings',
-          data: [12, 19, 15, 25, 22, 30],
-          borderColor: '#2563EB',
-          backgroundColor: 'rgba(37,99,235,0.1)',
-          fill: true,
-          tension: 0.4
-        }]
-      },
-      options: { responsive: true, maintainAspectRatio: false }
-    });
+function showProfileTab(tab, event) {
+  if (event) event.preventDefault();
+  document.querySelectorAll('.profile-tab').forEach(function(t) { t.classList.add('hidden'); });
+  document.getElementById('tab-' + tab).classList.remove('hidden');
+  document.querySelectorAll('.profile-nav a').forEach(function(a) { a.classList.remove('active'); });
+  if (event && event.target) {
+    event.target.classList.add('active');
   }
-  if (ctx2 && typeof Chart !== 'undefined') {
-    adminCharts.revenueChart = new Chart(ctx2, {
-      type: 'doughnut',
-      data: {
-        labels: destinations.slice(0, 5).map(function(d) { return d.name; }),
-        datasets: [{
-          data: [25, 20, 30, 15, 10],
-          backgroundColor: ['#2563EB', '#EC4899', '#FACC15', '#3B82F6', '#F472B6']
-        }]
-      },
-      options: { responsive: true, maintainAspectRatio: false }
-    });
+  if (tab === 'bookings') {
+    loadProfileBookings();
   }
 }
+
+function loadProfileBookings() {
+  var list = document.getElementById('profileBookingsList');
+  if (!list) return;
+
+  list.innerHTML = '<div class="text-center" style="padding: 2rem;"><p>Loading your bookings...</p></div>';
+
+  var token = localStorage.getItem('escapeo-token');
+
+  if (token) {
+    fetch('/api/bookings', {
+      headers: {
+        'Authorization': 'Bearer ' + token
+      }
+    })
+    .then(function(res) {
+      if (!res.ok) throw new Error('Failed to load bookings');
+      return res.json();
+    })
+    .then(function(data) {
+      if (data.length === 0) {
+        list.innerHTML = '<div class="text-center" style="padding: 3rem;"><h3>No bookings yet</h3><p>Start exploring and book your first adventure!</p><button class="btn btn-primary" onclick="router(\'home\')">Explore Destinations</button></div>';
+        return;
+      }
+
+      list.innerHTML = data.map(function(b) {
+        var destName = b.destination_name || b.package_title || 'N/A';
+        var destImage = b.destination_image || b.package_image || '';
+        var destLocation = b.destination_location || b.package_destination || '';
+        var statusClass = 'status-' + (b.status || 'pending');
+
+        return '<div class="booking-item">' +
+          '<div class="booking-image">' +
+            '<img src="' + destImage + '" alt="' + destName + '">' +
+          '</div>' +
+          '<div class="booking-details">' +
+            '<h3>' + destName + '</h3>' +
+            '<p>📍 ' + destLocation + '</p>' +
+            '<p>📅 ' + (b.check_in || 'N/A') + ' to ' + (b.check_out || 'N/A') + '</p>' +
+            '<p>👥 ' + (b.adults || 0) + ' Adults, ' + (b.children || 0) + ' Children</p>' +
+            '<p>🏷 Ref: ' + (b.ref_number || b.id) + '</p>' +
+          '</div>' +
+          '<div class="booking-price">' + formatPrice(b.total_price || 0) + '</div>' +
+          '<div class="booking-status ' + statusClass + '">' + (b.status || 'pending') + '</div>' +
+        '</div>';
+      }).join('');
+    })
+    .catch(function(err) {
+      console.error('Error loading bookings:', err);
+      loadBookingsFromLocalStorage(list);
+    });
+  } else {
+    loadBookingsFromLocalStorage(list);
+  }
+}
+
 
 function loadAdminDestinations() {
   var tbody = document.getElementById('adminDestinationsTable');
-  tbody.innerHTML = destinations.map(function(d) {
+  if (!tbody) return;
+  var allDests = JSON.parse(localStorage.getItem('escapeo-destinations')) || destinations;
+  tbody.innerHTML = allDests.map(function(d) {
     return '<tr>' +
       '<td>' + d.name + '</td>' +
-      '<td>' + d.location + '</td>' +
-      '<td>' + formatPriceShort(d.price) + '</td>' +
-      '<td><button class="btn btn-sm btn-outline" onclick="editDestination(' + d.id + ')">Edit</button></td>' +'</tr>';
+      '<td>' + d.location + ', ' + d.country + '</td>' +
+      '<td>' + d.category + '</td>' +
+      '<td>' + formatPrice(d.price) + '/night</td>' +
+      '<td><button class="btn btn-sm" style="background:#ef4444;color:#fff;border-radius:6px;" onclick="deleteDestination(' + d.id + ')">🗑 Delete</button></td>' +
+    '</tr>';
   }).join('');
 }
 
-function loadAdminAnalytics() {
-  destroyAdminCharts();
-
-  var ctx1 = document.getElementById('monthlyRevenueChart');
-  var ctx2 = document.getElementById('popularDestinationsChart');
-
-  if (ctx1 && typeof Chart !== 'undefined') {
-    adminCharts.monthlyRevenueChart = new Chart(ctx1, {
-      type: 'line',
-      data: {
-        labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
-        datasets: [{
-          label: 'Revenue',
-          data: [12000, 19000, 15000, 25000, 22000, 30000],
-          borderColor: '#2563EB',
-          backgroundColor: 'rgba(37,99,235,0.1)',
-          fill: true,
-          tension: 0.4
-        }]
-      },
-      options: { responsive: true, maintainAspectRatio: false }
-    });
-  }
-  if (ctx2 && typeof Chart !== 'undefined') {
-    adminCharts.popularDestinationsChart = new Chart(ctx2, {
-      type: 'bar',
-      data: {
-        labels: destinations.slice(0, 5).map(function(d) { return d.name; }),
-        datasets: [{
-          label: 'Bookings',
-          data: [45, 38, 52, 29, 35],
-          backgroundColor: ['#2563EB', '#EC4899', '#FACC15', '#2563EB', '#EC4899']
-        }]
-      },
-      options: { responsive: true, maintainAspectRatio: false }
-    });
-  }
+function deleteDestination(id) {
+  var allDests = JSON.parse(localStorage.getItem('escapeo-destinations')) || destinations;
+  allDests = allDests.filter(function(d) { return d.id !== id; });
+  localStorage.setItem('escapeo-destinations', JSON.stringify(allDests));
+  loadAdminDestinations();
+  showToast('Destination deleted');
 }
 
-function previewImage(input) {
-  const preview = document.getElementById('imagePreview');
-  const hiddenInput = document.getElementById('destImage');
 
-  if (input.files && input.files[0]) {
-    const reader = new FileReader();
-    reader.onload = function(e) {
-      preview.innerHTML = '<img src="' + e.target.result + '" alt="Preview" style="max-width:200px;border-radius:8px;margin-top:10px;" />';
-      hiddenInput.value = e.target.result;
-    };
-    reader.readAsDataURL(input.files[0]);
-  }
+function previewDestImage(input) {
+  if (!input.files || !input.files[0]) return;
+  var file = input.files[0];
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    var preview = document.getElementById('imagePreview');
+    var placeholder = document.getElementById('imageUploadPlaceholder');
+    var urlInput = document.getElementById('destImage');
+    preview.src = e.target.result;
+    preview.classList.remove('hidden');
+    placeholder.style.display = 'none';
+    urlInput.value = '';
+    // Store base64 in a data attribute for later use
+    document.getElementById('imageUploadArea').dataset.base64 = e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+function previewDestImageUrl(url) {
+  if (!url) return;
+  var preview = document.getElementById('imagePreview');
+  var placeholder = document.getElementById('imageUploadPlaceholder');
+  var fileInput = document.getElementById('destImageFile');
+  preview.src = url;
+  preview.onload = function() {
+    preview.classList.remove('hidden');
+    placeholder.style.display = 'none';
+    document.getElementById('imageUploadArea').dataset.base64 = '';
+    fileInput.value = '';
+  };
+  preview.onerror = function() {
+    preview.classList.add('hidden');
+    placeholder.style.display = '';
+  };
 }
 
 function addDestination(e) {
   e.preventDefault();
+  var name     = document.getElementById('destName').value.trim();
+  var location = document.getElementById('destLocation').value.trim();
+  var country  = document.getElementById('destCountry').value.trim();
+  var price    = parseFloat(document.getElementById('destPrice').value);
+  var category = document.getElementById('destCategory').value;
+  var uploadArea = document.getElementById('imageUploadArea');
+  var base64Image = uploadArea ? uploadArea.dataset.base64 : '';
+  var image    = base64Image ||
+                 document.getElementById('destImage').value.trim() ||
+                 'https://images.unsplash.com/photo-1506929562872-bb421503ef21?w=800&q=80';
 
-  const imageValue = document.getElementById("destImage").value;
+  var allDests = JSON.parse(localStorage.getItem('escapeo-destinations')) || destinations;
+  var newId = allDests.reduce(function(max, d) { return d.id > max ? d.id : max; }, 0) + 1;
 
-  if (!imageValue) {
-    showToast("Please select an image file!", "error");
-    return;
-  }
-
-  const newDest = {
-    id: Date.now(),
-    name: document.getElementById("destName").value,
-    location: document.getElementById("destLocation").value,
-    country: document.getElementById("destCountry").value,
-    price: Number(document.getElementById("destPrice").value),
-    image: imageValue,
-    category: document.getElementById("destCategory").value,
+  var newDest = {
+    id: newId,
+    name: name,
+    location: location,
+    country: country,
+    category: category,
+    image: image,
+    price: price,
     rating: 4.5,
     reviews: 0
   };
 
-  destinations.push(newDest);
-  localStorage.setItem("escapeo-destinations", JSON.stringify(destinations));
+  allDests.push(newDest);
+  localStorage.setItem('escapeo-destinations', JSON.stringify(allDests));
 
-  renderDestinations();
+  // Reset form
+  ['destName','destLocation','destCountry','destPrice','destImage','destImageFile'].forEach(function(id) {
+    var el = document.getElementById(id);
+    if (el) el.value = '';
+  });
+  var preview = document.getElementById('imagePreview');
+  var placeholder = document.getElementById('imageUploadPlaceholder');
+  var uploadArea = document.getElementById('imageUploadArea');
+  if (preview) { preview.src = ''; preview.classList.add('hidden'); }
+  if (placeholder) placeholder.style.display = '';
+  if (uploadArea) uploadArea.dataset.base64 = '';
+
+  showToast('Destination "' + name + '" added successfully!');
+  showAdminTab('destinations', null);
+}
+
+function loadAdminDashboard() {
+  loadAdminOverview();
+  loadAdminBookings();
   loadAdminDestinations();
+  renderTopDestinationsChart();
+}
+function renderTopDestinationsChart() {
+  var container = document.getElementById('topDestinationsChart');
+  if (!container) return;
 
-  document.getElementById("destName").value = '';
-  document.getElementById("destLocation").value = '';
-  document.getElementById("destCountry").value = '';
-  document.getElementById("destPrice").value = '';
-  document.getElementById("destImage").value = '';
-  document.getElementById("destImageFile").value = '';
-  document.getElementById("imagePreview").innerHTML = '';
+  // Get data from localStorage
+  var localBookings = JSON.parse(localStorage.getItem('escapeo-bookings')) || [];
+  var counts = {};
+  localBookings.forEach(function(b) {
+    var name = b.destination ? b.destination.name : b.package ? b.package.title : null;
+    if (name) counts[name] = (counts[name] || 0) + 1;
+  });
 
-  showToast("Destination Added Successfully!");
+  // Demo data if no bookings
+  if (Object.keys(counts).length === 0) {
+    counts = { Tokyo: 4, Paris: 3, Maldives: 3, Bali: 2, London: 2, Istanbul: 1 };
+  }
+
+  var sorted = Object.entries(counts).sort(function(a, b) { return b[1] - a[1]; }).slice(0, 6);
+  var maxVal = sorted[0][1];
+
+  var colors = ['#7c3aed','#8b5cf6','#a78bfa','#3b82f6','#60a5fa','#93c5fd'];
+
+  var html = '<div style="display:flex; flex-direction:column; gap:14px;">';
+  sorted.forEach(function(entry, i) {
+    var name = entry[0];
+    var val  = entry[1];
+    var pct  = Math.round((val / maxVal) * 100);
+    var color = colors[i] || '#7c3aed';
+    html +=
+      '<div style="display:flex; align-items:center; gap:12px;">' +
+        '<div style="width:90px; font-size:0.85rem; color:#475569; font-weight:500; text-align:right; flex-shrink:0;">' + name + '</div>' +
+        '<div style="flex:1; background:#f1f5f9; border-radius:999px; height:28px; overflow:hidden;">' +
+          '<div style="width:' + pct + '%; height:100%; background:' + color + '; border-radius:999px; transition:width 0.6s ease; display:flex; align-items:center; justify-content:flex-end; padding-right:10px;">' +
+            '<span style="color:#fff; font-size:0.78rem; font-weight:700;">' + val + '</span>' +
+          '</div>' +
+        '</div>' +
+      '</div>';
+  });
+  html += '</div>';
+
+  container.innerHTML = html;
 }
 
-// ============================================
-// NEWSLETTER & CONTACT
-// ============================================
-function subscribeNewsletter(e) {
-  e.preventDefault();
-  var email = document.getElementById('newsletterEmail').value;
-  showToast('Thanks for subscribing! Check ' + email + ' for confirmation.');
-  document.getElementById('newsletterEmail').value = '';
+
+
+
+function loadAdminOverview() {
+  var token = localStorage.getItem('escapeo-token');
+  
+  // Calculate stats from localStorage as fallback
+  var localBookings = JSON.parse(localStorage.getItem('escapeo-bookings')) || [];
+  var totalRevenue = localBookings.reduce(function(sum, b) { return sum + (b.total || 0); }, 0);
+  var totalBookings = localBookings.length;
+  var pendingBookings = localBookings.filter(function(b) { return b.status === 'pending'; }).length;
+
+  // Update stat cards with local data first
+  var totalRevenueEl = document.getElementById('adminTotalRevenue');
+  var totalBookingsEl = document.getElementById('adminTotalBookings');
+  var totalCustomersEl = document.getElementById('adminTotalCustomers');
+  var pendingBookingsEl = document.getElementById('adminPendingBookings');
+
+  if (totalRevenueEl) totalRevenueEl.textContent = formatPrice(totalRevenue);
+  if (totalBookingsEl) totalBookingsEl.textContent = totalBookings.toLocaleString();
+  if (pendingBookingsEl) pendingBookingsEl.textContent = pendingBookings.toLocaleString();
+  if (totalCustomersEl) totalCustomersEl.textContent = '1';
+
+  if (!token) {
+    return;
+  }
+
+  fetch('/api/admin/stats', {
+    headers: { 'Authorization': 'Bearer ' + token }
+  })
+  .then(function(res) {
+    if (!res.ok) throw new Error('Failed to load admin stats');
+    return res.json();
+  })
+  .then(function(data) {
+    if (totalRevenueEl) totalRevenueEl.textContent = formatPrice(data.total_revenue || 0);
+    if (totalBookingsEl) totalBookingsEl.textContent = (data.total_bookings || 0).toLocaleString();
+    if (totalCustomersEl) totalCustomersEl.textContent = (data.total_customers || 0).toLocaleString();
+    if (pendingBookingsEl) pendingBookingsEl.textContent = (data.pending_bookings || 0).toLocaleString();
+
+  })
+  .catch(function(err) {
+    console.error('Admin stats error:', err);
+    showToast('Failed to load admin stats', 'error');
+  });
 }
 
-function sendContact(e) {
+function loadAdminBookings() {
+  var token = localStorage.getItem('escapeo-token');
+
+  var list = document.getElementById('adminBookingsList');
+  if (!list) return;
+
+  // First load from localStorage as fallback
+  var localBookings = JSON.parse(localStorage.getItem('escapeo-bookings')) || [];
+  
+  if (localBookings.length > 0) {
+    renderAdminBookingsTable(localBookings);
+  } else {
+    list.innerHTML = '<tr><td colspan="8" class="text-center">No bookings found</td></tr>';
+  }
+
+  if (!token) return;
+
+  list.innerHTML = '<tr><td colspan="8" class="text-center">Loading bookings...</td></tr>';
+
+  fetch('/api/bookings', {
+    headers: { 'Authorization': 'Bearer ' + token }
+  })
+  .then(function(res) {
+    if (!res.ok) throw new Error('Failed to load bookings');
+    return res.json();
+  })
+  .then(function(data) {
+    if (data.length === 0) {
+      list.innerHTML = '<tr><td colspan="8" class="text-center">No bookings found</td></tr>';
+      return;
+    }
+    renderAdminBookingsTable(data);
+  })
+  .catch(function(err) {
+    console.error('Admin bookings error:', err);
+    // Keep localStorage data displayed
+  });
+}
+
+function renderAdminBookingsTable(data) {
+  var list = document.getElementById('adminBookingsList');
+  if (!list) return;
+  
+  list.innerHTML = data.map(function(b) {
+    var statusClass = 'status-' + (b.status || 'pending');
+    var customerName = b.customer_name || 'N/A';
+    var customerEmail = b.customer_email || '';
+    var destName = b.destination_name || b.package_title || 'N/A';
+    var checkIn = b.check_in || (b.dates ? b.dates.checkIn : 'N/A');
+    var checkOut = b.check_out || (b.dates ? b.dates.checkOut : 'N/A');
+    var adults = b.adults || (b.travelers ? b.travelers.adults : 0);
+    var children = b.children || (b.travelers ? b.travelers.children : 0);
+    var totalPrice = b.total_price || b.total || 0;
+    var bookingId = b.id || b.ref_number || '';
+    
+    return '<tr>' +
+      '<td>' + (b.ref_number || b.id) + '</td>' +
+      '<td>' + customerName + '<br><small>' + customerEmail + '</small></td>' +
+      '<td>' + destName + '</td>' +
+      '<td>' + checkIn + ' to ' + checkOut + '</td>' +
+      '<td>' + adults + ' Adults, ' + children + ' Children</td>' +
+      '<td>' + formatPrice(totalPrice) + '</td>' +
+      '<td><span class="status-badge ' + statusClass + '">' + (b.status || 'pending') + '</span></td>' +
+      '<td>' +
+        '<button class="btn btn-sm btn-success" onclick="updateBookingStatus(\'' + bookingId + '\', \'confirmed\')">Confirm</button> ' +
+        '<button class="btn btn-sm btn-danger" onclick="updateBookingStatus(\'' + bookingId + '\', \'cancelled\')">Cancel</button>' +
+      '</td>' +
+    '</tr>';
+  }).join('');
+}
+
+function loadAdminUsers() {
+  var token = localStorage.getItem('escapeo-token');
+  if (!token) return;
+
+  var list = document.getElementById('adminUsersList');
+  if (!list) return;
+
+  list.innerHTML = '<tr><td colspan="5" class="text-center">Loading users...</td></tr>';
+
+  fetch('/api/admin/users', {
+    headers: { 'Authorization': 'Bearer ' + token }
+  })
+  .then(function(res) {
+    if (!res.ok) throw new Error('Failed to load users');
+    return res.json();
+  })
+  .then(function(data) {
+    if (data.length === 0) {
+      list.innerHTML = '<tr><td colspan="5" class="text-center">No users found</td></tr>';
+      return;
+    }
+
+    list.innerHTML = data.map(function(u) {
+      return '<tr>' +
+        '<td>' + u.id + '</td>' +
+        '<td>' + u.first_name + ' ' + u.last_name + '</td>' +
+        '<td>' + u.email + '</td>' +
+        '<td>' + u.role + '</td>' +
+        '<td>' + (u.created_at ? new Date(u.created_at).toLocaleDateString() : 'N/A') + '</td>' +
+      '</tr>';
+    }).join('');
+  })
+  .catch(function(err) {
+    console.error('Admin users error:', err);
+    list.innerHTML = '<tr><td colspan="5" class="text-center" style="color: #ef4444;">Error loading users</td></tr>';
+  });
+}
+
+function updateBookingStatus(bookingId, status) {
+  var token = localStorage.getItem('escapeo-token');
+  
+  // Update localStorage first
+  var localBookings = JSON.parse(localStorage.getItem('escapeo-bookings')) || [];
+  var bookingIndex = localBookings.findIndex(function(b) { return b.id == bookingId || b.ref_number == bookingId; });
+  if (bookingIndex > -1) {
+    localBookings[bookingIndex].status = status;
+    localStorage.setItem('escapeo-bookings', JSON.stringify(localBookings));
+    bookings = localBookings;
+  }
+  
+  showToast('Booking status updated to ' + status);
+  loadAdminBookings();
+  loadAdminOverview();
+
+  if (!token) return;
+
+  fetch('/api/bookings/' + bookingId + '/status', {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer ' + token
+    },
+    body: JSON.stringify({ status: status })
+  })
+  .then(function(res) {
+    if (!res.ok) throw new Error('Failed to update status');
+    return res.json();
+  })
+  .then(function() {
+    showToast('Booking status updated to ' + status);
+    loadAdminBookings();
+    loadAdminOverview();
+  })
+  .catch(function(err) {
+    console.error('Update status error:', err);
+  });
+}
+
+function showAdminTab(tab, event) {
+  if (event) event.preventDefault();
+  document.querySelectorAll('.admin-tab').forEach(function(t) { t.classList.add('hidden'); });
+  var tabEl = document.getElementById('admin-tab-' + tab);
+  if (tabEl) tabEl.classList.remove('hidden');
+  
+  document.querySelectorAll('.admin-nav a').forEach(function(a) { a.classList.remove('active'); });
+  if (event && event.target) {
+    event.target.classList.add('active');
+  }
+  
+  if (tab === 'bookings') {
+    loadAdminBookings();
+  } else if (tab === 'destinations') {
+    loadAdminDestinations();
+  } else if (tab === 'overview') {
+    loadAdminOverview();
+    renderTopDestinationsChart();
+  }
+}
+
+function saveProfile(e) {
   e.preventDefault();
-  showToast('Message sent! We will get back to you soon.');
-  e.target.reset();
+  var firstName = document.getElementById('editFirstName').value;
+  var lastName = document.getElementById('editLastName').value;
+  var phone = document.getElementById('editPhone').value;
+  var currency = document.getElementById('editCurrency');
+  var language = document.getElementById('editLanguage');
+  var token = localStorage.getItem('escapeo-token');
+
+  if (token) {
+    fetch('/api/users/profile', {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + token
+      },
+      body: JSON.stringify({ firstName: firstName, lastName: lastName, phone: phone, preferredCurrency: currency ? currency.value : 'USD', language: language ? language.value : 'en' })
+    })
+    .then(function(res) { return res.json(); })
+    .then(function() {
+      currentUser.firstName = firstName;
+      currentUser.lastName = lastName;
+      localStorage.setItem('escapeo-user', JSON.stringify(currentUser));
+      updateAuthUI();
+      showToast('Profile updated successfully!');
+    })
+    .catch(function() {
+      showToast('Profile updated!');
+    });
+  } else {
+    currentUser.firstName = firstName;
+    currentUser.lastName = lastName;
+    localStorage.setItem('escapeo-user', JSON.stringify(currentUser));
+    updateAuthUI();
+    showToast('Profile updated!');
+  }
+}
+
+function changePassword(e) {
+  e.preventDefault();
+  var currentPassword = document.getElementById('currentPassword').value;
+  var newPassword = document.getElementById('newPassword').value;
+  var confirmNewPassword = document.getElementById('confirmNewPassword').value;
+  var token = localStorage.getItem('escapeo-token');
+
+  if (newPassword !== confirmNewPassword) {
+    showToast('Passwords do not match!', 'error');
+    return;
+  }
+
+  if (token) {
+    fetch('/api/users/password', {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + token
+      },
+      body: JSON.stringify({ currentPassword: currentPassword, newPassword: newPassword })
+    })
+    .then(function(res) {
+      if (!res.ok) throw new Error('Failed to change password');
+      return res.json();
+    })
+    .then(function() {
+      showToast('Password changed successfully!');
+      document.getElementById('passwordForm').reset();
+    })
+    .catch(function(err) {
+      showToast(err.message || 'Failed to change password', 'error');
+    });
+  } else {
+    showToast('Password changed!');
+    document.getElementById('passwordForm').reset();
+  }
+}
+
+
+function searchDestinationsLive(query) {
+  query = query.trim().toLowerCase();
+  var resultsEl = document.getElementById('searchResults');
+  if (!resultsEl) return;
+
+  if (!query) {
+    resultsEl.style.display = 'none';
+    resultsEl.innerHTML = '';
+    return;
+  }
+
+  var allDests = JSON.parse(localStorage.getItem('escapeo-destinations')) || destinations;
+  var matched = allDests.filter(function(d) {
+    return d.name.toLowerCase().includes(query) ||
+           d.location.toLowerCase().includes(query) ||
+           d.country.toLowerCase().includes(query) ||
+           d.category.toLowerCase().includes(query);
+  });
+
+  if (matched.length === 0) {
+    resultsEl.innerHTML = '<div class="search-no-results">No destinations found for "<strong>' + query + '</strong>"</div>';
+    resultsEl.style.display = 'block';
+    return;
+  }
+
+  resultsEl.innerHTML = matched.map(function(d) {
+    return '<div class="search-result-card" onclick="scrollToDestination(' + d.id + ')">' +
+      '<img src="' + d.image + '" alt="' + d.name + '" />' +
+      '<div class="search-result-info">' +
+        '<h4>' + d.name + '</h4>' +
+        '<p>📍 ' + d.location + ', ' + d.country + '</p>' +
+        '<span class="search-result-badge">' + d.category + '</span>' +
+      '</div>' +
+      '<div class="search-result-price">' +
+        '<strong>' + formatPriceShort(d.price) + '</strong>' +
+        '<span>/night</span>' +
+        '<button class="btn btn-primary btn-sm" onclick="event.stopPropagation(); startBooking(' + d.id + ')">Book</button>' +
+      '</div>' +
+    '</div>';
+  }).join('');
+
+  resultsEl.style.display = 'block';
 }
 
 function searchDestinations() {
-  var query = document.getElementById('searchDestination').value.toLowerCase().trim();
-  var resultsContainer = document.getElementById('searchResults');
-
+  var query = document.getElementById('searchDestination').value.trim();
+  searchDestinationsLive(query);
   if (!query) {
-    resultsContainer.style.display = 'none';
-    resultsContainer.innerHTML = '';
-    renderDestinations('all');
-    return;
-  }
-
-  var matched = destinations.filter(function(d) {
-    return d.name.toLowerCase().indexOf(query) > -1 || 
-           d.location.toLowerCase().indexOf(query) > -1 ||
-           d.country.toLowerCase().indexOf(query) > -1;
-  });
-
-  resultsContainer.style.display = 'block';
-
-  if (matched.length === 0) {
-    resultsContainer.innerHTML = 
-      '<div class="search-no-results">' +
-        '<div class="search-no-results-icon">🔍</div>' +
-        '<h3>No results found</h3>' +
-        '<p>Try a different city or country name</p>' +
-      '</div>';
-  } else {
-    var resultsHTML = 
-      '<div class="search-results-header">' +
-        '<h3>Search Results (' + matched.length + ')</h3>' +
-        '<div class="search-results-close" onclick="closeSearchResults()">✕</div>' +
-      '</div>' +
-      '<div class="search-results-grid">' +
-        matched.map(function(dest) {
-          return '<div class="search-result-item" onclick="startBooking(' + dest.id + '); closeSearchResults();">' +
-            '<img src="' + dest.image + '" alt="' + dest.name + '">' +
-            '<div class="search-result-info">' +
-              '<h4>' + dest.name + '</h4>' +
-              '<p>📍 ' + dest.location + ', ' + dest.country + '</p>' +
-              '<div class="price">' + formatPriceShort(dest.price) + '/night</div>' +
-            '</div>' +
-          '</div>';
-        }).join('') +
-      '</div>';
-    resultsContainer.innerHTML = resultsHTML;
+    // scroll to destinations section if no query
+    var section = document.getElementById('destinations');
+    if (section) section.scrollIntoView({ behavior: 'smooth' });
   }
 }
 
-function searchDestinationsLive(query) {
-  var resultsContainer = document.getElementById('searchResults');
-  if (!query || query.trim().length < 1) {
-    resultsContainer.style.display = 'none';
-    resultsContainer.innerHTML = '';
-    renderDestinations('all');
-    return;
-  }
-  searchDestinations();
-}
-
-function closeSearchResults() {
-  document.getElementById('searchResults').style.display = 'none';
-  document.getElementById('searchResults').innerHTML = '';
-  document.getElementById('searchDestination').value = '';
-  renderDestinations('all');
-}
-
-// ============================================
-// INITIALIZATION
-// ============================================
-document.addEventListener('DOMContentLoaded', function() {
-  // Handle Google OAuth callback if present in URL
-  handleGoogleCallback();
-
+function scrollToDestination(destId) {
+  // Close search results and scroll to destinations section
+  var resultsEl = document.getElementById('searchResults');
+  if (resultsEl) resultsEl.style.display = 'none';
+  var section = document.getElementById('destinations');
+  if (section) section.scrollIntoView({ behavior: 'smooth' });
+  // Highlight the matching card
   setTimeout(function() {
-    document.getElementById('loader').classList.add('hidden');
-  }, 1500);
+    renderDestinations('all');
+    // Set filter to all
+    document.querySelectorAll('.filter-tab').forEach(function(t) { t.classList.remove('active'); });
+    var allTab = document.querySelector('.filter-tab[data-filter="all"]');
+    if (allTab) allTab.classList.add('active');
+  }, 400);
+}
 
-  initNavbar();
-  initCurrencySwitcher();
-  updateAuthUI();
-  updateGreeting();
-
-  renderDestinations();
-  renderPackages();
-  renderTestimonials();
-
-  if (typeof Swiper !== 'undefined') {
-    new Swiper('.packages-swiper', {
-      slidesPerView: 1,
-      spaceBetween: 24,
-      loop: true,
-      autoplay: { delay: 5000, disableOnInteraction: false },
-      pagination: { el: '.swiper-pagination', clickable: true },
-      navigation: { nextEl: '.swiper-button-next', prevEl: '.swiper-button-prev' },
-      breakpoints: {
-        640: { slidesPerView: 2 },
-        1024: { slidesPerView: 3 }
-      }
-    });
+// Close search results when clicking outside
+document.addEventListener('click', function(e) {
+  var box = document.querySelector('.search-box');
+  var results = document.getElementById('searchResults');
+  if (results && box && !box.contains(e.target) && !results.contains(e.target)) {
+    results.style.display = 'none';
   }
+});
 
+document.addEventListener('DOMContentLoaded', function() {
+  // ✅ إخفاء الـ loader أول حاجة فوراً — مستقل عن أي حاجة تانية
+  hideLoader();
+
+  try { initNavbar(); } catch(e) { console.error('initNavbar:', e); }
+  try { initCurrencySwitcher(); } catch(e) { console.error('initCurrencySwitcher:', e); }
+  try { updateGreeting(); } catch(e) { console.error('updateGreeting:', e); }
+  try { updateAuthUI(); } catch(e) { console.error('updateAuthUI:', e); }
+  try { handleGoogleCallback(); } catch(e) { console.error('handleGoogleCallback:', e); }
+  try { router('home'); } catch(e) { console.error('router:', e); }
+
+  try { renderDestinations('all'); } catch(e) { console.error('renderDestinations:', e); }
+  try { renderPackages(); } catch(e) { console.error('renderPackages:', e); }
+  try { renderTestimonials(); } catch(e) { console.error('renderTestimonials:', e); }
+
+  // Filter tabs
   document.querySelectorAll('.filter-tab').forEach(function(tab) {
     tab.addEventListener('click', function() {
       document.querySelectorAll('.filter-tab').forEach(function(t) { t.classList.remove('active'); });
@@ -924,48 +1400,22 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   });
 
-  document.querySelectorAll('.filter-pill').forEach(function(pill) {
-    pill.addEventListener('click', function() {
-      document.querySelectorAll('.filter-pill').forEach(function(p) { p.classList.remove('active'); });
-      pill.classList.add('active');
-    });
-  });
+  // Auth forms
+  var loginForm = document.getElementById('loginForm');
+  if (loginForm) loginForm.addEventListener('submit', login);
 
-  document.querySelectorAll('.payment-method').forEach(function(method) {
-    method.addEventListener('click', function() {
-      document.querySelectorAll('.payment-method').forEach(function(m) { m.classList.remove('active'); });
-      method.classList.add('active');
-    });
-  });
+  var registerForm = document.getElementById('registerForm');
+  if (registerForm) registerForm.addEventListener('submit', register);
 
-  document.getElementById('overlay').addEventListener('click', function() {
-    document.querySelectorAll('.modal.active').forEach(function(m) { m.classList.remove('active'); });
-    document.getElementById('overlay').classList.remove('active');
-    document.body.style.overflow = '';
-  });
+  var contactForm = document.getElementById('contactForm');
+  if (contactForm) contactForm.addEventListener('submit', submitContact);
 
-  var regPassword = document.getElementById('regPassword');
-  if (regPassword) {
-    regPassword.addEventListener('input', function(e) {
-      var val = e.target.value;
-      var strength = document.getElementById('regPasswordStrength');
-      if (val.length < 6) strength.className = 'password-strength';
-      else if (val.length < 10) strength.className = 'password-strength weak';
-      else if (val.length < 14) strength.className = 'password-strength medium';
-      else strength.className = 'password-strength strong';
-    });
-  }
+  var newsletterForm = document.getElementById('newsletterForm');
+  if (newsletterForm) newsletterForm.addEventListener('submit', subscribeNewsletter);
 
-  document.querySelectorAll('a[href^="#"]').forEach(function(anchor) {
-    anchor.addEventListener('click', function(e) {
-      var href = this.getAttribute('href');
-      if (href !== '#') {
-        e.preventDefault();
-        var target = document.querySelector(href);
-        if (target) {
-          target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }
-      }
-    });
-  });
+  var profileForm = document.getElementById('profileForm');
+  if (profileForm) profileForm.addEventListener('submit', saveProfile);
+
+  var passwordForm = document.getElementById('passwordForm');
+  if (passwordForm) passwordForm.addEventListener('submit', changePassword);
 });

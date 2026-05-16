@@ -387,7 +387,7 @@ input, select, textarea { font-family: inherit; outline: none; }
 
 /* Admin Dashboard */
 .admin-layout { display: grid; grid-template-columns: 260px 1fr; min-height: 100vh; }
-.admin-sidebar { background: var(--gray-900); color: var(--gray-300); padding: 1.5rem; display: flex; flex-direction: column; position: fixed; width: 260px; height: 100vh; overflow-y: auto; }
+.admin-sidebar { background: var(--gray-900); color: var(--gray-300); padding: 1.5rem; display: flex; flex-direction: column; width: 260px; overflow-y: auto; }
 .admin-logo { font-family: var(--font-display); font-size: 1.35rem; font-weight: 700; color: var(--white); display: flex; align-items: center; gap: 0.5rem; margin-bottom: 2rem; padding-bottom: 1.5rem; border-bottom: 1px solid var(--gray-800); }
 .admin-nav { display: flex; flex-direction: column; gap: 0.25rem; flex: 1; }
 .admin-nav a { padding: 0.85rem 1rem; border-radius: var(--radius); font-weight: 500; font-size: 0.9rem; transition: all 0.3s; display: flex; align-items: center; gap: 0.75rem; }
@@ -583,14 +583,16 @@ min-height: 100vh;
 
 .admin-sidebar {
   width: 250px;
+  min-width: 250px;
   background: #1e293b;
   color: white;
   padding: 2rem 1rem;
-  position: fixed;
+  position: sticky;
   top: 70px;
-  left: 0;
-  bottom: 0;
+  height: calc(100vh - 70px);
   overflow-y: auto;
+  flex-shrink: 0;
+  align-self: flex-start;
 }
 
 .admin-sidebar h2 {
@@ -618,7 +620,6 @@ min-height: 100vh;
 
 .admin-content {
   flex: 1;
-  margin-left: 250px;
   padding: 2rem;
   background: #f1f5f9;
   min-height: calc(100vh - 70px);
@@ -653,14 +654,7 @@ min-height: 100vh;
   margin-top: 0.5rem;
 }
 
-.admin-tab canvas {
-  background: white;
-  padding: 1.5rem;
-  border-radius: 12px;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-  margin-bottom: 2rem;
-  max-height: 400px;
-}
+/* canvas rule removed - chart uses HTML bars */
 
 .admin-form {
   display: flex;
@@ -891,14 +885,7 @@ min-height: 100vh;
   margin-top: 0.5rem;
 }
 
-.admin-tab canvas {
-  background: white;
-  padding: 1.5rem;
-  border-radius: 12px;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-  margin-bottom: 2rem;
-  max-height: 400px;
-}
+/* canvas rule removed - chart uses HTML bars */
 
 .admin-form {
   display: flex;
@@ -1229,4 +1216,215 @@ min-height: 100vh;
   max-width: 200px;
   border-radius: 8px;
   box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+/* Admin Bookings Table Styles */
+#admin-bookings .data-table {
+    font-size: 0.9rem;
+}
+
+#admin-bookings .data-table th {
+    background: linear-gradient(135deg, #1e293b, #334155);
+    color: white;
+    font-weight: 600;
+    padding: 1rem;
+    text-align: left;
+}
+
+#admin-bookings .data-table td {
+    padding: 1rem;
+    border-bottom: 1px solid #e2e8f0;
+    vertical-align: middle;
+}
+
+#admin-bookings .data-table tr:hover td {
+    background: #f8fafc;
+}
+
+#admin-bookings .booking-status {
+    display: inline-block;
+    padding: 0.35rem 0.75rem;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+#admin-bookings .status-confirmed {
+    background: #dbeafe;
+    color: #1d4ed8;
+}
+
+#admin-bookings .status-pending {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+#admin-bookings .status-completed {
+    background: #d1fae5;
+    color: #065f46;
+}
+
+#admin-bookings .status-cancelled {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+#admin-bookings .admin-toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+#admin-bookings .search-input {
+    padding: 0.75rem 1rem;
+    border: 2px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    min-width: 300px;
+    transition: all 0.3s;
+}
+
+#admin-bookings .search-input:focus {
+    outline: none;
+    border-color: #7c3aed;
+    box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.1);
+}
+
+@media (max-width: 768px) {
+    #admin-bookings .data-table-wrapper {
+        overflow-x: auto;
+    }
+
+    #admin-bookings .search-input {
+        min-width: 100%;
+    }
+}
+/* Image Upload Area */
+.image-upload-area {
+  border: 2px dashed var(--gray-300);
+  border-radius: var(--radius-lg);
+  padding: 2rem 1rem;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s;
+  background: var(--gray-50);
+  min-height: 160px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+  margin-bottom: 0.75rem;
+}
+.image-upload-area:hover {
+  border-color: var(--violet-400);
+  background: var(--violet-50);
+}
+.image-upload-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  pointer-events: none;
+}
+.upload-icon { font-size: 2.5rem; }
+.image-upload-placeholder p { color: var(--gray-600); font-weight: 500; margin: 0; }
+.upload-hint { font-size: 0.8rem; color: var(--gray-400); }
+.image-preview {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+  border-radius: var(--radius);
+  display: block;
+}
+.image-url-divider {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin: 0.75rem 0;
+  color: var(--gray-400);
+  font-size: 0.82rem;
+}
+.image-url-divider::before,
+.image-url-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--gray-200);
+}
+
+/* Search Results */
+.search-results {
+  background: var(--white);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-xl);
+  overflow: hidden;
+  animation: fadeIn 0.2s ease;
+}
+.search-result-card {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem 1.25rem;
+  cursor: pointer;
+  transition: background 0.2s;
+  border-bottom: 1px solid var(--gray-100);
+}
+.search-result-card:last-child { border-bottom: none; }
+.search-result-card:hover { background: var(--violet-50); }
+.search-result-card img {
+  width: 70px;
+  height: 55px;
+  object-fit: cover;
+  border-radius: var(--radius);
+  flex-shrink: 0;
+}
+.search-result-info { flex: 1; }
+.search-result-info h4 {
+  font-weight: 600;
+  color: var(--gray-900);
+  margin-bottom: 0.2rem;
+  font-size: 0.95rem;
+}
+.search-result-info p {
+  font-size: 0.82rem;
+  color: var(--gray-500);
+  margin-bottom: 0.3rem;
+}
+.search-result-badge {
+  display: inline-block;
+  font-size: 0.72rem;
+  padding: 0.15rem 0.6rem;
+  background: var(--violet-100);
+  color: var(--violet-700);
+  border-radius: var(--radius-full);
+  font-weight: 600;
+  text-transform: capitalize;
+}
+.search-result-price {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.4rem;
+  flex-shrink: 0;
+}
+.search-result-price strong {
+  font-size: 1rem;
+  color: var(--violet-600);
+  font-weight: 700;
+}
+.search-result-price span {
+  font-size: 0.78rem;
+  color: var(--gray-400);
+  margin-top: -0.3rem;
+}
+.search-no-results {
+  padding: 1.5rem;
+  text-align: center;
+  color: var(--gray-500);
+  font-size: 0.95rem;
 }
