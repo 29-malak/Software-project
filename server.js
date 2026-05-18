@@ -21,7 +21,6 @@ const PORT = process.env.PORT || 3000;
 const JWT_SECRET = process.env.JWT_SECRET || 'escapeo-secret-key-2026';
 const IS_PRODUCTION = process.env.NODE_ENV === 'production';
 
-// ✅ FIX 1: BASE_URL كامل لازم يتحدد صح
 const BASE_URL = process.env.BASE_URL || `http://localhost:${PORT}`;
 
 // ============================================
@@ -53,8 +52,6 @@ app.use(passport.session());
 
 passport.serializeUser((user, done) => done(null, user));
 passport.deserializeUser((user, done) => done(null, user));
-
-// ✅ FIX 3: callbackURL كامل مش relative
 passport.use(new GoogleStrategy({
   clientID: process.env.GOOGLE_CLIENT_ID || '',
   clientSecret: process.env.GOOGLE_CLIENT_SECRET || '',
@@ -109,11 +106,9 @@ passport.use(new GoogleStrategy({
 app.get('/auth/google',
   passport.authenticate('google', {
     scope: ['profile', 'email'],
-    prompt: 'select_account'  // بيخلي المستخدم يختار الأكونت دايماً
+    prompt: 'select_account' 
   })
 );
-
-// ✅ FIX 4: callback route منفصل تماماً قبل أي wildcard
 app.get('/auth/google/callback',
   passport.authenticate('google', {
     failureRedirect: '/?error=google_auth_failed',

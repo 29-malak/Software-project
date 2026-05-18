@@ -1377,7 +1377,6 @@ document.addEventListener('click', function(e) {
 });
 
 document.addEventListener('DOMContentLoaded', function() {
-  // ✅ إخفاء الـ loader أول حاجة فوراً — مستقل عن أي حاجة تانية
   hideLoader();
 
   try { initNavbar(); } catch(e) { console.error('initNavbar:', e); }
